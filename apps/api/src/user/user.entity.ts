@@ -10,7 +10,7 @@ export enum UserRole {
 @Entity({name: 'users'})
 export class UserEntity {
     @PrimaryGeneratedColumn('uuid')
-    id_user: number;
+    id_user: string;
 
     @Column({
         type: "varchar",
@@ -35,7 +35,7 @@ export class UserEntity {
     @Column({
         nullable: false
     })
-    password: string;
+    password?: string;
 
     @BeforeInsert()
     async hashPassword() {

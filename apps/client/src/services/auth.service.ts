@@ -13,5 +13,21 @@ export function removeToken() {
 }
 
 export function isAuthenticated() {
-    return !!getToken();
+  const token = getToken();
+  if (!token) return false;
+
+  try {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+
+    // cek exp dari JWT jika ada
+    if (payload.exp && payload.exp * 1000 < Date.now()) {
+      removeToken();
+      return false;
+    }
+
+    return true;
+  } catch (e) {
+    removeToken();
+    return false;
+  }
 }
