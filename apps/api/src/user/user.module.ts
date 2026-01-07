@@ -14,10 +14,10 @@ import { AuthMiddleware } from "./middleware/auth.middleware";
 export class UserModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
         consumer.apply(AuthMiddleware)
-        .exclude(
-        { path: 'api/user/login', method: RequestMethod.POST },
-        { path: 'api/users', method: RequestMethod.POST }
-      )
+    //     .exclude(
+    //     { path: 'api/user/login', method: RequestMethod.POST },
+    //     { path: 'api/users', method: RequestMethod.POST }
+    //   )
         .forRoutes({path: '*', method: RequestMethod.ALL});
     }
 }

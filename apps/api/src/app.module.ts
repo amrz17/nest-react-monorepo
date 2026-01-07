@@ -7,6 +7,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from './user/user.module';
 import { DataSource } from 'typeorm';
+import { InboundModule } from './inbound/inbound.module';
+import { OrdersModule } from './orders/orders.module';
 
 @Module({
   imports: [
@@ -33,7 +35,9 @@ import { DataSource } from 'typeorm';
         synchronize: false,
       }),
     }),
-    UserModule
+    UserModule,
+    InboundModule,
+    OrdersModule
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -11,9 +11,9 @@ import { UpdateUserDto } from './dto/updateUser.dto';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>) {
+  constructor(@InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>) {}
 
-  }
+  // Register User
   async createUser(createUserDto: CreateUserDto): Promise<IUserResponse> {
     const newUser = new UserEntity();
     Object.assign(newUser, createUserDto);
@@ -39,6 +39,7 @@ export class UserService {
     return this.generatedUserResponse(saveUser);
   }
 
+  // Login User 
    async loginUser(loginUserDto: LoginDto): Promise<UserEntity> {
     const user = await this.userRepository.findOne({
         where: {
@@ -99,6 +100,9 @@ export class UserService {
             email: user.email
         },
         process.env.JWT_SECRET,
+        // {
+        //     expiresIn: '24h',   // ⬅️ TOKEN AKAN EXPIRED DALAM 1 HARI
+        // },
     );
   }
 
