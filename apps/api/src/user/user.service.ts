@@ -39,6 +39,7 @@ export class UserService {
     return this.generatedUserResponse(saveUser);
   }
 
+
   // Login User 
    async loginUser(loginUserDto: LoginDto): Promise<UserEntity> {
     const user = await this.userRepository.findOne({
@@ -76,6 +77,7 @@ export class UserService {
     return await this.userRepository.save(user);
    }
 
+   // Find User by ID
    async findById(id_user: string): Promise<UserEntity> {
     const user = await this.userRepository.findOne({
         where: {

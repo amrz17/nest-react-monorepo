@@ -1,5 +1,10 @@
 import { IOrder } from "./order.type";
 
 export class IOrdersResponse {
-    orders: IOrder[];
+    success?: boolean;
+    message?: string;
+    data?: {
+        order: IOrder | IOrder[];
+        total?: number;
+    };
 }
