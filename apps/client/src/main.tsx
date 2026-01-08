@@ -1,4 +1,4 @@
-import React, { StrictMode, type ReactNode } from 'react'
+import { StrictMode, type ReactNode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import {
@@ -9,8 +9,15 @@ import { Navigate } from 'react-router-dom'
 import { isAuthenticated } from './services/auth.service.ts'
 
 import LoginPage from './pages/Login.tsx'
-import Home from './pages/Home.tsx'
+import Home from './pages/Dashboard.tsx'
 import SignupPage from './pages/SignUp.tsx'
+import Inventory from './pages/Inventory.tsx'
+import Orders from './pages/Orders.tsx'
+import Purchase from './pages/Purchase.tsx'
+import Reporting from './pages/Reporting.tsx'
+import Support from './pages/Support.tsx'
+import Settings from './pages/Settings.tsx'
+import Dashboard from './pages/Dashboard.tsx'
 
 
 function Protected({ children }: { children: ReactNode }) {
@@ -35,10 +42,58 @@ const router = createBrowserRouter([
     path: "/",
     element: (
       <Protected>
-         <Home />
+         <Dashboard />
       </Protected>
     )
-  }
+  },
+  {
+    path: "/inventory",
+    element: (
+      <Protected>
+         <Inventory />
+      </Protected>
+    )
+  },
+  {
+    path: "/orders",
+    element: (
+      <Protected>
+         <Orders />
+      </Protected>
+    )
+  },
+  {
+    path: "/purchase",
+    element: (
+      <Protected>
+         <Purchase />
+      </Protected>
+    )
+  },
+  {
+    path: "/reporting",
+    element: (
+      <Protected>
+         <Reporting />
+      </Protected>
+    )
+  },
+  {
+    path: "/support",
+    element: (
+      <Protected>
+         <Support />
+      </Protected>
+    )
+  },
+  {
+    path: "/settings",
+    element: (
+      <Protected>
+         <Settings />
+      </Protected>
+    )
+  },
 ])
 
 createRoot(document.getElementById('root')!).render(
