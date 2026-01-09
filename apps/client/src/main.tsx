@@ -9,7 +9,6 @@ import { Navigate } from 'react-router-dom'
 import { isAuthenticated } from './services/auth.service.ts'
 
 import LoginPage from './pages/Login.tsx'
-import Home from './pages/Dashboard.tsx'
 import SignupPage from './pages/SignUp.tsx'
 import Inventory from './pages/Inventory.tsx'
 import Orders from './pages/Orders.tsx'
@@ -18,6 +17,7 @@ import Reporting from './pages/Reporting.tsx'
 import Support from './pages/Support.tsx'
 import Settings from './pages/Settings.tsx'
 import Dashboard from './pages/Dashboard.tsx'
+import { Toaster } from 'sonner'
 
 
 function Protected({ children }: { children: ReactNode }) {
@@ -99,5 +99,6 @@ const router = createBrowserRouter([
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <RouterProvider router={router} />
+    <Toaster />
   </StrictMode>,
 )
