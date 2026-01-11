@@ -1,0 +1,70 @@
+import { MigrationInterface, QueryRunner } from "typeorm";
+
+export class CreateDatabase1768114164895 implements MigrationInterface {
+    name = 'CreateDatabase1768114164895'
+
+    public async up(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`CREATE TABLE "locations" ("id_location" uuid NOT NULL DEFAULT uuid_generate_v4(), "bin_code" character varying NOT NULL, "description" text, "created_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "UQ_ae0f70d0e42f6e577a17d048510" UNIQUE ("bin_code"), CONSTRAINT "PK_2e73b1fc5b967273d2c7dd853b7" PRIMARY KEY ("id_location"))`);
+        await queryRunner.query(`CREATE TABLE "inventory" ("id_item" uuid NOT NULL DEFAULT uuid_generate_v4(), "quantity" integer NOT NULL DEFAULT '0', "last_updated" TIMESTAMP NOT NULL DEFAULT now(), "created_at" TIMESTAMP NOT NULL DEFAULT now(), "itemIdItem" uuid, "locationIdLocation" uuid, CONSTRAINT "UQ_8ee4757364549983d121f9881f0" UNIQUE ("itemIdItem", "locationIdLocation"), CONSTRAINT "PK_c8c4617b0e2d3ed23f646a44dbb" PRIMARY KEY ("id_item"))`);
+        await queryRunner.query(`CREATE TABLE "items" ("id_item" uuid NOT NULL DEFAULT uuid_generate_v4(), "sku" character varying NOT NULL, "name" character varying NOT NULL, "description" text, "price" numeric(10,2) NOT NULL, "isActive" boolean NOT NULL DEFAULT true, "created_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "UQ_ed4485e4da7cc242cf46db2e3a9" UNIQUE ("sku"), CONSTRAINT "PK_f425d2daf1cac427d052cd00a03" PRIMARY KEY ("id_item"))`);
+        await queryRunner.query(`CREATE TABLE "purchase_order_items" ("id_poi" uuid NOT NULL DEFAULT uuid_generate_v4(), "qty_ordered" integer NOT NULL, "price_per_unit" numeric(10,2) NOT NULL, "qty_received" integer NOT NULL DEFAULT '0', "total_price" numeric(10,2) NOT NULL, "purchaseOrderIdPo" uuid, "itemIdItem" uuid, CONSTRAINT "PK_5cdc9cea738fb7317a8056ed1ce" PRIMARY KEY ("id_poi"))`);
+        await queryRunner.query(`CREATE TABLE "suppliers" ("id_supplier" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "suppliers_address" text NOT NULL, "pic_name" character varying NOT NULL, CONSTRAINT "UQ_5b5720d9645cee7396595a16c93" UNIQUE ("name"), CONSTRAINT "PK_f2dc88217f64de773c2b5680f7a" PRIMARY KEY ("id_supplier"))`);
+        await queryRunner.query(`CREATE TYPE "public"."purchase_orders_po_status_enum" AS ENUM('PENDING', 'APPROVED', 'SHIPPED', 'RECEIVED', 'CANCELED', 'COMPLETED')`);
+        await queryRunner.query(`CREATE TABLE "purchase_orders" ("id_po" uuid NOT NULL DEFAULT uuid_generate_v4(), "po_number" character varying NOT NULL, "expected_delivery_date" date, "po_status" "public"."purchase_orders_po_status_enum" NOT NULL DEFAULT 'PENDING', "note" character varying NOT NULL, "last_updated" TIMESTAMP NOT NULL DEFAULT now(), "created_at" TIMESTAMP NOT NULL DEFAULT now(), "createdByIdUser" uuid, "id_supplier" uuid, CONSTRAINT "UQ_74065a5d2b8c4c14b8b8fcf0159" UNIQUE ("po_number"), CONSTRAINT "PK_66ea391e379c6cf276f73f9512a" PRIMARY KEY ("id_po"))`);
+        await queryRunner.query(`CREATE TABLE "inbounds" ("id_inbound" uuid NOT NULL DEFAULT uuid_generate_v4(), "inbound_number" character varying NOT NULL, "received_at" TIMESTAMP NOT NULL, "total_items" integer NOT NULL, "status" character varying NOT NULL, "note" character varying, "id_po" uuid, "id_user" uuid, "id_supplier" uuid, CONSTRAINT "UQ_9a168f99a44e4e697660d45fd72" UNIQUE ("inbound_number"), CONSTRAINT "PK_10acab85128256e0e493cfc61ed" PRIMARY KEY ("id_inbound"))`);
+        await queryRunner.query(`CREATE TYPE "public"."users_role_enum" AS ENUM('ADMIN', 'MANAGER', 'STAFF_GUDANG', 'PICKER')`);
+        await queryRunner.query(`CREATE TABLE "users" ("id_user" uuid NOT NULL DEFAULT uuid_generate_v4(), "full_name" character varying(255) NOT NULL, "username" character varying(50) NOT NULL, "email" character varying, "password" character varying NOT NULL, "role" "public"."users_role_enum" NOT NULL DEFAULT 'STAFF_GUDANG', "created_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "UQ_fe0bb3f6520ee0469504521e710" UNIQUE ("username"), CONSTRAINT "PK_fbb07fa6fbd1d74bee9782fb945" PRIMARY KEY ("id_user"))`);
+        await queryRunner.query(`CREATE TABLE "customers" ("id_customer" uuid NOT NULL DEFAULT uuid_generate_v4(), "customer_name" character varying NOT NULL, "customer_address" text, "customer_phone" character varying NOT NULL, "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "created_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "UQ_a1dded0c9e77a3e62a09d20ed88" UNIQUE ("customer_name"), CONSTRAINT "PK_5bb1d14d487c9a2f298ed76a3f9" PRIMARY KEY ("id_customer"))`);
+        await queryRunner.query(`CREATE TABLE "sale_order_items" ("id_soi" uuid NOT NULL DEFAULT uuid_generate_v4(), "qty_ordered" integer NOT NULL, "price_at_order" numeric(10,2) NOT NULL, "last_updated" TIMESTAMP NOT NULL DEFAULT now(), "created_at" TIMESTAMP NOT NULL DEFAULT now(), "id_so" uuid, "id_item" uuid, CONSTRAINT "PK_e79cc732b4b7a0071c1b3a8e91a" PRIMARY KEY ("id_soi"))`);
+        await queryRunner.query(`CREATE TYPE "public"."sales_orders_so_status_enum" AS ENUM('PENDING', 'APPROVED', 'PICKING', 'SHIPPED', 'CANCELED', 'COMPLETED')`);
+        await queryRunner.query(`CREATE TABLE "sales_orders" ("id_so" uuid NOT NULL DEFAULT uuid_generate_v4(), "so_number" character varying NOT NULL, "so_status" "public"."sales_orders_so_status_enum" NOT NULL DEFAULT 'PENDING', "date_so" TIMESTAMP NOT NULL, "customer_address" character varying NOT NULL, "customer_phone" character varying NOT NULL, "total_amount" integer NOT NULL, "status" character varying NOT NULL, "note" character varying NOT NULL, "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "created_at" TIMESTAMP NOT NULL DEFAULT now(), "id_customer" uuid, CONSTRAINT "UQ_11d4347629a3126af8cca9787d3" UNIQUE ("so_number"), CONSTRAINT "PK_20959038dd0b4ae7395baa11b76" PRIMARY KEY ("id_so"))`);
+        await queryRunner.query(`CREATE TABLE "outbounds" ("id_outbound" uuid NOT NULL DEFAULT uuid_generate_v4(), "outbound_number" character varying NOT NULL, "shipped_at" TIMESTAMP NOT NULL, "carrier_name" character varying NOT NULL, "tracking_number" character varying NOT NULL, "total_items" integer NOT NULL, "note" character varying, "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "created_at" TIMESTAMP NOT NULL DEFAULT now(), "id_so" uuid, "id_user" uuid, CONSTRAINT "UQ_b9aec4f8cbab6309839b4b5901a" UNIQUE ("outbound_number"), CONSTRAINT "PK_99782c9ddc8dba7a469167bde32" PRIMARY KEY ("id_outbound"))`);
+        await queryRunner.query(`ALTER TABLE "inventory" ADD CONSTRAINT "FK_20e05cfec2dd55303d3d309f321" FOREIGN KEY ("itemIdItem") REFERENCES "items"("id_item") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "inventory" ADD CONSTRAINT "FK_2e5f514a4b12b64a3a964fffbb6" FOREIGN KEY ("locationIdLocation") REFERENCES "locations"("id_location") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "purchase_order_items" ADD CONSTRAINT "FK_cd9490acafcf15549aa40282553" FOREIGN KEY ("purchaseOrderIdPo") REFERENCES "purchase_orders"("id_po") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "purchase_order_items" ADD CONSTRAINT "FK_e757fdc72cc8f3066c1dc39c765" FOREIGN KEY ("itemIdItem") REFERENCES "items"("id_item") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "purchase_orders" ADD CONSTRAINT "FK_ccec05bbe46715fc5f2a3f8c1f6" FOREIGN KEY ("createdByIdUser") REFERENCES "users"("id_user") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "purchase_orders" ADD CONSTRAINT "FK_cb6ae7d21ca1c7c00f50393e027" FOREIGN KEY ("id_supplier") REFERENCES "suppliers"("id_supplier") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "inbounds" ADD CONSTRAINT "FK_66b9ae2a4753bce84c786929f6f" FOREIGN KEY ("id_po") REFERENCES "purchase_orders"("id_po") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "inbounds" ADD CONSTRAINT "FK_2abb154c5ec54ec57b93da0b91b" FOREIGN KEY ("id_user") REFERENCES "users"("id_user") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "inbounds" ADD CONSTRAINT "FK_c88d5fcc81b951ca416c97dd227" FOREIGN KEY ("id_supplier") REFERENCES "suppliers"("id_supplier") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "sale_order_items" ADD CONSTRAINT "FK_893babfadf11841c7a490c68367" FOREIGN KEY ("id_so") REFERENCES "sales_orders"("id_so") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "sale_order_items" ADD CONSTRAINT "FK_113eb7211d95b2adaadd5872164" FOREIGN KEY ("id_item") REFERENCES "items"("id_item") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "sales_orders" ADD CONSTRAINT "FK_98a47b1a71a9324b8d2b43ec54a" FOREIGN KEY ("id_customer") REFERENCES "customers"("id_customer") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "outbounds" ADD CONSTRAINT "FK_13f76a64172b71408fee737a4e7" FOREIGN KEY ("id_so") REFERENCES "sales_orders"("id_so") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+        await queryRunner.query(`ALTER TABLE "outbounds" ADD CONSTRAINT "FK_5b2a35aa2081fdf1e36a46224fa" FOREIGN KEY ("id_user") REFERENCES "users"("id_user") ON DELETE NO ACTION ON UPDATE NO ACTION`);
+    }
+
+    public async down(queryRunner: QueryRunner): Promise<void> {
+        await queryRunner.query(`ALTER TABLE "outbounds" DROP CONSTRAINT "FK_5b2a35aa2081fdf1e36a46224fa"`);
+        await queryRunner.query(`ALTER TABLE "outbounds" DROP CONSTRAINT "FK_13f76a64172b71408fee737a4e7"`);
+        await queryRunner.query(`ALTER TABLE "sales_orders" DROP CONSTRAINT "FK_98a47b1a71a9324b8d2b43ec54a"`);
+        await queryRunner.query(`ALTER TABLE "sale_order_items" DROP CONSTRAINT "FK_113eb7211d95b2adaadd5872164"`);
+        await queryRunner.query(`ALTER TABLE "sale_order_items" DROP CONSTRAINT "FK_893babfadf11841c7a490c68367"`);
+        await queryRunner.query(`ALTER TABLE "inbounds" DROP CONSTRAINT "FK_c88d5fcc81b951ca416c97dd227"`);
+        await queryRunner.query(`ALTER TABLE "inbounds" DROP CONSTRAINT "FK_2abb154c5ec54ec57b93da0b91b"`);
+        await queryRunner.query(`ALTER TABLE "inbounds" DROP CONSTRAINT "FK_66b9ae2a4753bce84c786929f6f"`);
+        await queryRunner.query(`ALTER TABLE "purchase_orders" DROP CONSTRAINT "FK_cb6ae7d21ca1c7c00f50393e027"`);
+        await queryRunner.query(`ALTER TABLE "purchase_orders" DROP CONSTRAINT "FK_ccec05bbe46715fc5f2a3f8c1f6"`);
+        await queryRunner.query(`ALTER TABLE "purchase_order_items" DROP CONSTRAINT "FK_e757fdc72cc8f3066c1dc39c765"`);
+        await queryRunner.query(`ALTER TABLE "purchase_order_items" DROP CONSTRAINT "FK_cd9490acafcf15549aa40282553"`);
+        await queryRunner.query(`ALTER TABLE "inventory" DROP CONSTRAINT "FK_2e5f514a4b12b64a3a964fffbb6"`);
+        await queryRunner.query(`ALTER TABLE "inventory" DROP CONSTRAINT "FK_20e05cfec2dd55303d3d309f321"`);
+        await queryRunner.query(`DROP TABLE "outbounds"`);
+        await queryRunner.query(`DROP TABLE "sales_orders"`);
+        await queryRunner.query(`DROP TYPE "public"."sales_orders_so_status_enum"`);
+        await queryRunner.query(`DROP TABLE "sale_order_items"`);
+        await queryRunner.query(`DROP TABLE "customers"`);
+        await queryRunner.query(`DROP TABLE "users"`);
+        await queryRunner.query(`DROP TYPE "public"."users_role_enum"`);
+        await queryRunner.query(`DROP TABLE "inbounds"`);
+        await queryRunner.query(`DROP TABLE "purchase_orders"`);
+        await queryRunner.query(`DROP TYPE "public"."purchase_orders_po_status_enum"`);
+        await queryRunner.query(`DROP TABLE "suppliers"`);
+        await queryRunner.query(`DROP TABLE "purchase_order_items"`);
+        await queryRunner.query(`DROP TABLE "items"`);
+        await queryRunner.query(`DROP TABLE "inventory"`);
+        await queryRunner.query(`DROP TABLE "locations"`);
+    }
+
+}

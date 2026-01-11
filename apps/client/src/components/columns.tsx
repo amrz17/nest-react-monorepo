@@ -69,7 +69,6 @@ export const columnsOrders = (
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuItem
               onClick={() => onEdit(purchaseOrder)}
             >

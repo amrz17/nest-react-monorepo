@@ -1,10 +1,12 @@
-import { BeforeInsert, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from "typeorm";
-import * as bcrypt from 'bcrypt';
+import { BeforeInsert, Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import * as bcrypt from 'bcryptjs';
+import { InboundEntity } from "../inbound/inbound.entity";
 
 export enum UserRole {
-    ADMIN = "admin",
-    STAFF = "staff",
-    CUSTOMER = "customer",
+  ADMIN = 'ADMIN',
+  MANAGER = 'MANAGER',
+  STAFF_GUDANG = 'STAFF_GUDANG', 
+  PICKER = 'PICKER',             
 }
 
 @Entity({name: 'users'})
@@ -17,7 +19,7 @@ export class UserEntity {
         length: 255,
         nullable: false
     })
-    name: string;
+    full_name: string;
 
     @Column({
         type: "varchar",
@@ -48,7 +50,7 @@ export class UserEntity {
     @Column({
         type: "enum",
         enum: UserRole,
-        default: UserRole.CUSTOMER,
+        default: UserRole.STAFF_GUDANG,
         nullable: false
     })
     role: UserRole;
@@ -58,4 +60,6 @@ export class UserEntity {
     })
     created_at: Date;
 
+    @OneToMany(() => InboundEntity, (inbound) => inbound.received_by)
+    inbounds: InboundEntity[];  
 }
