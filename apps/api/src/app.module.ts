@@ -6,7 +6,7 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from './user/user.module';
-import { OrdersModule } from './purchase-orders/orders.module';
+import { OrdersModule } from './orders/orders.module';
 import { InventoryModule } from './inventory/inventory.module';
 import { InboundController } from './inbound/inbound.controller';
 import { InboundService } from './inbound/inbound.service';
@@ -14,10 +14,9 @@ import { InboundModule } from './inbound/inbound.module';
 import { OutboundModule } from './outbound/outbound.module';
 import { ItemsController } from './items/items.controller';
 import { ItemsService } from './items/items.service';
-import { ItemsModule } from './items/items.module';
 import { LocationsModule } from './locations/locations.module';
-import { SalesController } from './sales-orders/sales.controller';
-import { SalesService } from './sales-orders/sales.service';
+import { SalesController } from './sales/sales.controller';
+import { SalesService } from './sales/sales.service';
 import { PurchaseOrderItemsService } from './purchase-order-items/purchase-order-items.service';
 import { PurchaseOrderItemsController } from './purchase-order-items/purchase-order-items.controller';
 import { PurchaseOrderItemsModule } from './purchase-order-items/purchase-order-items.module';
@@ -27,6 +26,10 @@ import { SaleOrderItemsService } from './sale-order-items/sale-order-items.servi
 import { CustomersController } from './customers/customers.controller';
 import { CustomersModule } from './customers/customers.module';
 import { SuppliersModule } from './suppliers/suppliers.module';
+import { SuppliersController } from './suppliers/suppliers.controller';
+import { SuppliersService } from './suppliers/suppliers.service';
+import { SalesModule } from './sales/sales.module';
+import { ItemsModule } from './items/items.module';
 
 @Module({
   imports: [
@@ -53,19 +56,20 @@ import { SuppliersModule } from './suppliers/suppliers.module';
         synchronize: false,
       }),
     }),
+    ItemsModule,
     UserModule,
     OrdersModule,
     InventoryModule,
     InboundModule,
     OutboundModule,
-    ItemsModule,
     LocationsModule,
     PurchaseOrderItemsModule,
     SaleOrderItemsModule,
     CustomersModule,
-    SuppliersModule
+    SuppliersModule,
+    SalesModule
   ],
-  controllers: [AppController, InboundController, ItemsController, SalesController, PurchaseOrderItemsController, SaleOrderItemsController, CustomersController],
-  providers: [AppService, InboundService, ItemsService, SalesService, PurchaseOrderItemsService, SaleOrderItemsService],
+  controllers: [AppController, InboundController, SalesController, PurchaseOrderItemsController, SaleOrderItemsController, CustomersController, SuppliersController],
+  providers: [AppService, InboundService, SalesService, PurchaseOrderItemsService, SaleOrderItemsService, SuppliersService],
 })
 export class AppModule {}

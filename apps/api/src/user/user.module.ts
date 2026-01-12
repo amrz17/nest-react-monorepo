@@ -4,9 +4,13 @@ import { UserService } from "./user.service";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { UserEntity } from "./user.entity";
 import { AuthMiddleware } from "./middleware/auth.middleware";
+import { InboundEntity } from "../inbound/inbound.entity";
 
 @Module({
-    imports: [TypeOrmModule.forFeature([UserEntity])],
+    imports: [TypeOrmModule.forFeature([
+        UserEntity,
+        InboundEntity
+    ])],
     controllers: [UserContainerOptions],
     providers: [UserService],
     exports: [UserService],

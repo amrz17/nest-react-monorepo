@@ -2,7 +2,7 @@ import { InventoryEntity } from "../inventory/inventory.entity";
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({name: 'items'})
-export class ItemEntity {
+export class ItemsEntity {
     // Define item properties here
     @PrimaryGeneratedColumn('uuid')
     id_item: string;

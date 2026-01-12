@@ -1,4 +1,4 @@
-import { ItemEntity } from "../items/items.entity";
+import { ItemsEntity } from "../items/items.entity";
 import { LocationEntity } from "../locations/locations.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, Unique, UpdateDateColumn } from "typeorm";
 
@@ -9,8 +9,8 @@ export class InventoryEntity {
     @PrimaryGeneratedColumn('uuid')
     id_item: string;
 
-    @ManyToOne(() => ItemEntity, (item) => item.inventories)
-    item: ItemEntity;
+    @ManyToOne(() => ItemsEntity, (item) => item.inventories)
+    item: ItemsEntity;
 
     @ManyToOne(() => LocationEntity, (location) => location.inventories)
     location: LocationEntity;

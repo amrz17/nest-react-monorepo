@@ -1,4 +1,4 @@
-import { OrderEntity } from "../purchase-orders/orders.entity";
+import { OrderEntity } from "../orders/orders.entity";
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: 'suppliers'})
@@ -15,6 +15,6 @@ export class SupplierEntity {
     @Column()
     pic_name: string;
 
-    @OneToMany(() => OrderEntity, (po) => po.supplier)
+    @OneToMany(() => OrderEntity, (order) => order.supplier)
     purchase_order: OrderEntity[];
 }

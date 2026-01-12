@@ -1,5 +1,5 @@
-import { PurchaseOrderItemsEntity } from "../purchase-order-items/order-items.entity";
 import { SupplierEntity } from "../suppliers/suppliers.entity";
+import { PurchaseOrderItemsEntity } from "../purchase-order-items/order-items.entity";
 import { UserEntity } from "../user/user.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 

@@ -1,5 +1,5 @@
-import { ItemEntity } from "../items/items.entity";
-import { SalesOrderEntity } from "../sales-orders/sales-order.entity";
+import { ItemsEntity } from "../items/items.entity";
+import { SalesOrderEntity } from "../sales/sales-order.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity( { name: 'sale_order_items' } )
@@ -12,9 +12,9 @@ export class SaleOrderItemsEntity {
     @JoinColumn({ name: 'id_so' })
     sales_order: SalesOrderEntity;
 
-    @ManyToOne(() => ItemEntity)
+    @ManyToOne(() => ItemsEntity)
     @JoinColumn({ name: 'id_item' })
-    item: ItemEntity;
+    item: ItemsEntity;
 
     @Column({ type: 'int' })
     qty_ordered: number;

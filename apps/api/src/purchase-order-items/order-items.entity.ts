@@ -1,5 +1,5 @@
-import { ItemEntity } from "../items/items.entity";
-import { OrderEntity } from "../purchase-orders/orders.entity";
+import { ItemsEntity } from "../items/items.entity";
+import { OrderEntity } from "../orders/orders.entity";
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity({ name: 'purchase_order_items' })
@@ -11,8 +11,8 @@ export class PurchaseOrderItemsEntity {
     @ManyToOne(() => OrderEntity, (purchaseOrder) => purchaseOrder.items)
     purchaseOrder: OrderEntity;
 
-    @ManyToOne(() => ItemEntity)
-    item: ItemEntity;
+    @ManyToOne(() => ItemsEntity)
+    item: ItemsEntity;
 
     @Column()
     qty_ordered: number;

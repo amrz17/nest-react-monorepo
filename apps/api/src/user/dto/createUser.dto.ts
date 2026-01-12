@@ -1,14 +1,10 @@
 import { IsEmail, IsNotEmpty } from "class-validator";
+import { UserRole } from "../user.entity";
 
-export enum UserRole {
-    ADMIN = "admin",
-    STAFF = "staff",
-    CUSTOMER = "customer",
-}
 
 export class CreateUserDto {
     @IsNotEmpty()
-     name: string;
+     full_name: string;
 
     @IsNotEmpty()
      username: string;

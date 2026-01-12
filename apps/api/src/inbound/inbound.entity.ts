@@ -1,4 +1,4 @@
-import { OrderEntity } from "../purchase-orders/orders.entity";
+import { OrderEntity } from "../orders/orders.entity";
 import { SupplierEntity } from "../suppliers/suppliers.entity";
 import { UserEntity } from "../user/user.entity";
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
