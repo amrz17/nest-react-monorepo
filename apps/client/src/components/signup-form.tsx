@@ -37,7 +37,7 @@ export function SignupForm({
           <Input 
             id="name" 
             type="text"  
-            {...register("name", { required: "Name is required" })}
+            {...register("full_name", { required: "Name is required" })}
             placeholder="John Doe" 
           />
         </Field>
@@ -72,8 +72,10 @@ export function SignupForm({
             className="border rounded px-3 py-2 w-full text-gray-500"
           >
             <option value="" >-- Choose Role --</option>
-            <option value="staff">Staff</option>
-            <option value="customer">Customer</option>
+            {/* <option value="MANAGER">Manager</option> */}
+            {/* <option value="ADMIN">Admin</option> */}
+            <option value="STAFF_GUDANG">Staff</option>
+            <option value="PICKER">Picker</option>
           </select>
 
           {errors.role && <p className="text-red-500">{errors.role.message}</p>}

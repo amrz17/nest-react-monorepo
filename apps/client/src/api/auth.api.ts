@@ -10,7 +10,7 @@ export const loginApi = (data: {
 
 // Register User
 export const registerApi = (data: {
-    name: string,
+    full_name: string,
     username: string,
     email: string,
     password: string,

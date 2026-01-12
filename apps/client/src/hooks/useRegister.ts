@@ -3,7 +3,7 @@ import { registerApi } from "@/api/auth.api"
 import { useNavigate } from "react-router-dom"
 
 type RegisterFormValues = {
-    name: string,
+    full_name: string,
     username: string,
     email: string,
     password: string,
@@ -25,7 +25,7 @@ export function useRegister() {
 
         try {
             const res = await registerApi({
-                name: data.name,
+                full_name: data.full_name,
                 username: data.username,
                 email: data.email,
                 password: data.confirmPassword,
