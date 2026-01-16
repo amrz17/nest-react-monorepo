@@ -13,3 +13,8 @@ npm i --workspace api bcryipt
 
 install for jwt token : 
 npm i --workspace api jsonwebtoken @nestjs/config
+
+migration database cmd : 
+npm run db:drop 
+npm run migration:generate --name=namaPerubahannya
+npm run migration:run
