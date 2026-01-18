@@ -1,5 +1,5 @@
 import { createOrderApi, deleteOrderApi, updateOrderApi } from "@/api/order.api"
-import type { OrderPayload } from "@/schemas/order.schema"
+import type { OrderPayload } from "@/schemas/schema"
 import { useState } from "react"
 
 export function useOrders() {

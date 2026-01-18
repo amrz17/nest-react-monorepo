@@ -1,6 +1,5 @@
 import { createItemApi, deleteItemApi, updateItemApi } from "@/api/item.api";
-import { deleteOrderApi } from "@/api/order.api";
-import type { ItemPayload } from "@/schemas/order.schema";
+import type { ItemPayload } from "@/schemas/schema";
 import { useState } from "react";
 
 export function useItems() {
