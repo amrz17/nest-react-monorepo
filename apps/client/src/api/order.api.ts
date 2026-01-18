@@ -1,6 +1,6 @@
 import type { PurchaseOrder } from "@/components/columns"
 import api from "./axios"
-import type { OrderPayload } from "@/schemas/order.schema"
+import type { OrderPayload } from "@/schemas/schema"
 
 // Get All Orders
 export const fetchOrders = async (): Promise<PurchaseOrder[]> => {

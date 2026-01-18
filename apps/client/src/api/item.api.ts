@@ -1,4 +1,4 @@
-import type { ItemPayload } from "@/schemas/order.schema"
+import type { ItemPayload } from "@/schemas/schema"
 import api from "./axios"
 import type { ItemsOrder } from "@/types/item.type"
 
