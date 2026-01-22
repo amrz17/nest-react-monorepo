@@ -1,12 +1,12 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { OrderEntity, PurchaseOrderStatus } from './orders.entity';
+import { OrderEntity, PurchaseOrderStatus } from './entities/orders.entity';
 import { DataSource, Repository } from 'typeorm';
 import { IOrdersResponse } from './types/ordersResponse.interface';
 import { UpdateOrderDto } from './dto/update-order.dto';
-import { PurchaseOrderItemsEntity } from 'src/purchase-order-items/order-items.entity';
-import { CreatePOIDto } from 'src/purchase-order-items/dto/create-poitem.dto';
+import { PurchaseOrderItemsEntity } from 'src/orders/entities/order-items.entity';
+import { CreatePOIDto } from 'src/orders/dto/create-poitem.dto';
 
 @Injectable()
 export class OrdersService {
@@ -16,8 +16,8 @@ export class OrdersService {
    private readonly dataSource: DataSource
 ) {}
 
-  // Create Order // TODO make logic for PO  
-   async createOrder(createOrderDto: CreateOrderDto): Promise<any> {
+  // Create Order   
+   async createOrder(createOrderDto: CreateOrderDto): Promise<OrderEntity> {
       // // Create a new order entity
       // const newOrder = new OrderEntity();
       // // Assign the DTO properties to the new order entity
@@ -26,7 +26,6 @@ export class OrdersService {
       // // Save the new order to the database
       // return this.orderRepository.save(newOrder);
 
-      // TODO : Make transaction
       const queryRunner = this.dataSource.createQueryRunner();
       await queryRunner.connect();
       await queryRunner.startTransaction();

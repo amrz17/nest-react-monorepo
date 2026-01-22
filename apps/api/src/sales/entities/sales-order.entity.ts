@@ -1,6 +1,6 @@
-import { CustomerEntity } from "../customers/customer.entity";
-import { SaleOrderItemsEntity } from "../sale-order-items/sale-order-items.entity";
-import { UserEntity } from "../user/user.entity";
+import { CustomerEntity } from "../../customers/customer.entity";
+import { SaleOrderItemsEntity } from "./sale-order-items.entity";
+import { UserEntity } from "../../user/user.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 export enum SalesOrderStatus {

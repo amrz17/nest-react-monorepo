@@ -1,15 +1,15 @@
-import { SupplierEntity } from "../suppliers/suppliers.entity";
-import { PurchaseOrderItemsEntity } from "../purchase-order-items/order-items.entity";
-import { UserEntity } from "../user/user.entity";
+import { SupplierEntity } from "../../suppliers/suppliers.entity";
+import { PurchaseOrderItemsEntity } from "./order-items.entity";
+import { UserEntity } from "../../user/user.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { InboundEntity } from "../inbound/inbound.entity";
+import { InboundEntity } from "../../inbound/entities/inbound.entity";
 
 export enum PurchaseOrderStatus {
   PENDING = 'PENDING',     // Baru dibuat, menunggu persetujuan manager
   APPROVED = 'APPROVED',   // Sudah oke, sudah dikirim ke supplier
   SHIPPED = 'SHIPPED',     // Supplier sudah kirim, barang di jalan
   RECEIVED = 'RECEIVED',   // Barang sudah sampai di gudang & di-input ke stok
-  CANCELED = 'CANCELED',   // Batal beli
+  CANCELED = 'CANCELED',   // Batal Pesan
   COMPLETED = 'COMPLETED', // Selesai (Administrasi & stok sudah sinkron)
 }
 

@@ -1,6 +1,6 @@
 import { Type } from 'class-transformer';
 import { IsString, IsDate, IsOptional, IsUUID, IsArray, ValidateNested } from 'class-validator';
-import { CreatePOIDto } from 'src/purchase-order-items/dto/create-poitem.dto';
+import { CreatePOIDto } from 'src/orders/dto/create-poitem.dto';
 
 export class CreateOrderDto {
     @IsOptional()

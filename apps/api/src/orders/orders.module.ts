@@ -2,11 +2,11 @@ import { Module } from '@nestjs/common';
 import { OrdersController } from './orders.controller';
 import { OrdersService } from './orders.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { OrderEntity } from './orders.entity';
+import { OrderEntity } from './entities/orders.entity';
 import { SupplierEntity } from '../suppliers/suppliers.entity';
-import { PurchaseOrderItemsEntity } from '../purchase-order-items/order-items.entity';
+import { PurchaseOrderItemsEntity } from './entities/order-items.entity';
 import { UserEntity } from '../user/user.entity';
-import { InboundEntity } from '../inbound/inbound.entity';
+import { InboundEntity } from '../inbound/entities/inbound.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([

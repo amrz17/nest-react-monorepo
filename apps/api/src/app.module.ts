@@ -11,8 +11,6 @@ import { InventoryModule } from './inventory/inventory.module';
 import { InboundModule } from './inbound/inbound.module';
 import { OutboundModule } from './outbound/outbound.module';
 import { LocationsModule } from './locations/locations.module';
-import { PurchaseOrderItemsModule } from './purchase-order-items/purchase-order-items.module';
-import { SaleOrderItemsModule } from './sale-order-items/sale-order-items.module';
 import { CustomersModule } from './customers/customers.module';
 import { SuppliersModule } from './suppliers/suppliers.module';
 import { SalesModule } from './sales/sales.module';
@@ -50,8 +48,6 @@ import { ItemsModule } from './items/items.module';
     InboundModule,
     OutboundModule,
     LocationsModule,
-    PurchaseOrderItemsModule,
-    SaleOrderItemsModule,
     CustomersModule,
     SuppliersModule,
     SalesModule
