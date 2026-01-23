@@ -1,6 +1,6 @@
 import { IInbound } from "./inbound.type";
 
-export interface IInboundresponse {
+export interface IInboundResponse {
     success?: boolean;
     message?: string;
     inbounds?: IInbound | IInbound[];

@@ -20,6 +20,7 @@ export class InboundItemEntity {
     @JoinColumn({ name: 'id_item' })
     items: ItemsEntity;
 
+    @Column()
     id_poi: string;
     @ManyToOne(() => PurchaseOrderItemsEntity)
     @JoinColumn({ name: 'id_poi' })

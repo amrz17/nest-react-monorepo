@@ -2,9 +2,6 @@ import { IsNumber, IsUUID, Min } from "class-validator";
 
 export class CreateInboundItemDto {
     @IsUUID()
-    id_inbound: string;
-
-    @IsUUID()
     id_item: string;
 
     @IsUUID()
