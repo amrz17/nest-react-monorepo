@@ -1,8 +1,15 @@
 import { OrderEntity } from "../../orders/entities/orders.entity";
 import { SupplierEntity } from "../../suppliers/suppliers.entity";
 import { UserEntity } from "../../user/user.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { InboundItemEntity } from "./inbound-item.entity";
+
+export enum StatusInbound {
+    CANCELED = 'CANCELED',
+    DRAFT = 'DRAFT',
+    PARTIAL = 'PARTIAL',
+    RECEIVED = 'RECEIVED'
+}
 
 @Entity({ name: 'inbounds' })
 export class InboundEntity {
@@ -40,6 +47,17 @@ export class InboundEntity {
     @OneToMany(() => InboundItemEntity, (inboundItem) => inboundItem.inbound)
     @JoinColumn({ name: 'id_inbound_item' })
     items: InboundItemEntity[];
+
+    @Column({
+        type: 'enum',
+        enum: StatusInbound,
+        default: StatusInbound.RECEIVED,
+        nullable: false
+    })
+    status_inbound: string;
+
+    @UpdateDateColumn()
+    last_update: Date;
 
     @CreateDateColumn({
         type: "timestamp"

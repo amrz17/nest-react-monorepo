@@ -10,7 +10,7 @@ export enum PurchaseOrderStatus {
   SHIPPED = 'SHIPPED',     // Supplier sudah kirim, barang di jalan
   RECEIVED = 'RECEIVED',   // Barang sudah sampai di gudang & di-input ke stok
   CANCELED = 'CANCELED',   // Batal Pesan
-  COMPLETED = 'COMPLETED', // Selesai (Administrasi & stok sudah sinkron)
+  COMPLETED = 'COMPLETED', // Selesai 
 }
 
 @Entity({name: 'purchase_orders'})

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InboundEntity } from './entities/inbound.entity';
 import { DataSource, Repository } from 'typeorm';
@@ -6,9 +6,10 @@ import { CreateInboundDto } from './dto/create-inbound.dto';
 import { UpdateInboundDto } from './dto/update-inbound.dto';
 import { InboundItemEntity } from './entities/inbound-item.entity';
 import { IInboundResponse } from './types/inboundResponse.interface';
-import { InventoryEntity } from 'src/inventory/inventory.entity';
-import { PurchaseOrderItemsEntity } from 'src/orders/entities/order-items.entity';
-import { OrderEntity, PurchaseOrderStatus } from 'src/orders/entities/orders.entity';
+import { InventoryEntity } from '../inventory/inventory.entity';
+import { PurchaseOrderItemsEntity } from '../orders/entities/order-items.entity';
+import { OrderEntity, PurchaseOrderStatus } from '../orders/entities/orders.entity';
+import { QueryRunner } from 'typeorm/browser';
 
 @Injectable()
 export class InboundService {
@@ -23,7 +24,6 @@ export class InboundService {
     async createInbound(
         createInboundDto: CreateInboundDto
     ): Promise<any> {
-        // TODO Make Logic business
         const queryRunner = this.dataSource.createQueryRunner();
         // Connect TO DB
         await queryRunner.connect();
@@ -125,16 +125,95 @@ export class InboundService {
         
     }
 
-    async updateInbound(
-        updateInboundDto: UpdateInboundDto
+    async getAllInbound(): Promise<InboundEntity[]> {
+        return await this.inboundRepo.find({});
+    }
+
+    // 
+    async cancelInbound(
+        id_inbound: string
     ): Promise<any> {
-        // TODO Make Logic update
+        const queryRunner = this.dataSource.createQueryRunner();
+        await queryRunner.connect();
+        await queryRunner.startTransaction();
+
+        try {
+            // Ambil data Inbound beserta detailnya
+            const inbound = await queryRunner.manager.findOne(InboundEntity, {
+                where: { id_inbound },
+                relations: ['items'] 
+            });
+
+            if (!inbound) throw new NotFoundException('Inbound not found');
+            if (inbound.status_inbound === 'CANCELED') throw new BadRequestException('Already cancelled');
+
+            // Loop Items untuk Mengembalikan Stok
+            for (const item of inbound.items) {
+                
+                // Kurangi stok di Inventory
+                await queryRunner.manager.decrement(InventoryEntity,
+                    { id_item: item.id_item },
+                    "qty_available",
+                    item.qty_received
+                );
+
+                // Kurangi qty_received di Purchase Order Item
+                await queryRunner.manager.decrement(PurchaseOrderItemsEntity,
+                    { id_poi: item.id_poi },
+                    "qty_received",
+                    item.qty_received
+                );
+            }
+
+            // Ubah status Inbound Header
+            inbound.status_inbound = 'CANCELED';
+            await queryRunner.manager.save(inbound);
+
+            // Update kembali status PO Header ke 'PARTIAL' atau 'OPEN'
+            await this.updatePOStatus(inbound.id_po, queryRunner);
+
+            await queryRunner.commitTransaction();
+        } catch (err) {
+            await queryRunner.rollbackTransaction();
+            throw err;
+        } finally {
+            await queryRunner.release();
+        }
+    }
+
+    // 
+    private async updatePOStatus(id_po: string, queryRunner: QueryRunner): Promise<void> {
+        // Ambil semua item dari PO tersebut
+        const allPoItems = await queryRunner.manager.find(PurchaseOrderItemsEntity, {
+            where: { id_po: id_po }
+        });
+
+        // Hitung status berdasarkan qty
+        let totalOrdered = 0;
+        let totalReceived = 0;
+
+        allPoItems.forEach(item => {
+            totalOrdered += Number(item.qty_ordered);
+            totalReceived += Number(item.qty_received);
+        });
+
+        let newStatus = 'PENDING';
+        if (totalReceived >= totalOrdered) {
+            newStatus = 'COMPLETED';
+        } else if (totalReceived > 0) {
+            newStatus = 'RECEIVED';
+        }
+
+        // Update status ke tabel PO Header
+        await queryRunner.manager.update(OrderEntity, 
+            { id_po: id_po }, 
+            { po_status: newStatus as any }
+        );
     }
 
 
    // Helper method to generate order response
    generatedOrderResponse(inbound: InboundEntity | InboundEntity[]): IInboundResponse {
-      // Return the order(s) wrapped in a response object
       return {
          success: true,
          inbounds: inbound 

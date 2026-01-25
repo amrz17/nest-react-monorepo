@@ -1,7 +1,8 @@
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToMany, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { InboundEntity } from "./inbound.entity";
 import { PurchaseOrderItemsEntity } from "../../orders/entities/order-items.entity";
 import { ItemsEntity } from "../../items/items.entity";
+
 
 @Entity({ name: 'inbound_items'})
 export class InboundItemEntity {

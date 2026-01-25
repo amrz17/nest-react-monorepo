@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from "typeorm";
 
-export class FixRelationOnInbound1769184536052 implements MigrationInterface {
-    name = 'FixRelationOnInbound1769184536052'
+export class AddStatusInbound1769366552472 implements MigrationInterface {
+    name = 'AddStatusInbound1769366552472'
 
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`CREATE TABLE "suppliers" ("id_supplier" uuid NOT NULL DEFAULT uuid_generate_v4(), "name" character varying NOT NULL, "suppliers_address" text NOT NULL, "pic_name" character varying NOT NULL, CONSTRAINT "UQ_5b5720d9645cee7396595a16c93" UNIQUE ("name"), CONSTRAINT "PK_f2dc88217f64de773c2b5680f7a" PRIMARY KEY ("id_supplier"))`);
@@ -12,7 +12,8 @@ export class FixRelationOnInbound1769184536052 implements MigrationInterface {
         await queryRunner.query(`CREATE TABLE "purchase_order_items" ("id_poi" uuid NOT NULL DEFAULT uuid_generate_v4(), "id_po" uuid NOT NULL, "id_item" uuid NOT NULL, "qty_ordered" integer NOT NULL, "price_per_unit" numeric(10,2) NOT NULL, "qty_received" integer NOT NULL DEFAULT '0', "total_price" numeric(10,2) NOT NULL, CONSTRAINT "PK_5cdc9cea738fb7317a8056ed1ce" PRIMARY KEY ("id_poi"))`);
         await queryRunner.query(`CREATE TYPE "public"."purchase_orders_po_status_enum" AS ENUM('PENDING', 'APPROVED', 'SHIPPED', 'RECEIVED', 'CANCELED', 'COMPLETED')`);
         await queryRunner.query(`CREATE TABLE "purchase_orders" ("id_po" uuid NOT NULL DEFAULT uuid_generate_v4(), "id_user" uuid NOT NULL, "po_number" character varying NOT NULL, "id_supplier" uuid NOT NULL, "expected_delivery_date" date, "po_status" "public"."purchase_orders_po_status_enum" NOT NULL DEFAULT 'PENDING', "note" character varying NOT NULL, "last_updated" TIMESTAMP NOT NULL DEFAULT now(), "created_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "UQ_74065a5d2b8c4c14b8b8fcf0159" UNIQUE ("po_number"), CONSTRAINT "PK_66ea391e379c6cf276f73f9512a" PRIMARY KEY ("id_po"))`);
-        await queryRunner.query(`CREATE TABLE "inbounds" ("id_inbound" uuid NOT NULL DEFAULT uuid_generate_v4(), "inbound_number" character varying NOT NULL, "id_po" uuid NOT NULL, "id_user" uuid NOT NULL, "received_at" TIMESTAMP NOT NULL, "id_supplier" uuid NOT NULL, "note" character varying, "created_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "UQ_9a168f99a44e4e697660d45fd72" UNIQUE ("inbound_number"), CONSTRAINT "PK_10acab85128256e0e493cfc61ed" PRIMARY KEY ("id_inbound"))`);
+        await queryRunner.query(`CREATE TYPE "public"."inbounds_status_inbound_enum" AS ENUM('CANCELED', 'DRAFT', 'PARTIAL', 'RECEIVED')`);
+        await queryRunner.query(`CREATE TABLE "inbounds" ("id_inbound" uuid NOT NULL DEFAULT uuid_generate_v4(), "inbound_number" character varying NOT NULL, "id_po" uuid NOT NULL, "id_user" uuid NOT NULL, "received_at" TIMESTAMP NOT NULL, "id_supplier" uuid NOT NULL, "note" character varying, "status_inbound" "public"."inbounds_status_inbound_enum" NOT NULL DEFAULT 'RECEIVED', "last_update" TIMESTAMP NOT NULL DEFAULT now(), "created_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "UQ_9a168f99a44e4e697660d45fd72" UNIQUE ("inbound_number"), CONSTRAINT "PK_10acab85128256e0e493cfc61ed" PRIMARY KEY ("id_inbound"))`);
         await queryRunner.query(`CREATE TYPE "public"."users_role_enum" AS ENUM('ADMIN', 'MANAGER', 'STAFF_GUDANG', 'PICKER')`);
         await queryRunner.query(`CREATE TABLE "users" ("id_user" uuid NOT NULL DEFAULT uuid_generate_v4(), "full_name" character varying(255) NOT NULL, "username" character varying(50) NOT NULL, "email" character varying, "password" character varying NOT NULL, "role" "public"."users_role_enum" NOT NULL DEFAULT 'STAFF_GUDANG', "created_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "UQ_fe0bb3f6520ee0469504521e710" UNIQUE ("username"), CONSTRAINT "PK_fbb07fa6fbd1d74bee9782fb945" PRIMARY KEY ("id_user"))`);
         await queryRunner.query(`CREATE TABLE "customers" ("id_customer" uuid NOT NULL DEFAULT uuid_generate_v4(), "customer_name" character varying NOT NULL, "customer_address" text, "customer_phone" character varying NOT NULL, "updated_at" TIMESTAMP NOT NULL DEFAULT now(), "created_at" TIMESTAMP NOT NULL DEFAULT now(), CONSTRAINT "UQ_a1dded0c9e77a3e62a09d20ed88" UNIQUE ("customer_name"), CONSTRAINT "PK_5bb1d14d487c9a2f298ed76a3f9" PRIMARY KEY ("id_customer"))`);
@@ -65,6 +66,7 @@ export class FixRelationOnInbound1769184536052 implements MigrationInterface {
         await queryRunner.query(`DROP TABLE "users"`);
         await queryRunner.query(`DROP TYPE "public"."users_role_enum"`);
         await queryRunner.query(`DROP TABLE "inbounds"`);
+        await queryRunner.query(`DROP TYPE "public"."inbounds_status_inbound_enum"`);
         await queryRunner.query(`DROP TABLE "purchase_orders"`);
         await queryRunner.query(`DROP TYPE "public"."purchase_orders_po_status_enum"`);
         await queryRunner.query(`DROP TABLE "purchase_order_items"`);
