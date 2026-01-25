@@ -6,6 +6,9 @@ import { CreateInboundDto } from './dto/create-inbound.dto';
 import { UpdateInboundDto } from './dto/update-inbound.dto';
 import { InboundItemEntity } from './entities/inbound-item.entity';
 import { IInboundResponse } from './types/inboundResponse.interface';
+import { InventoryEntity } from 'src/inventory/inventory.entity';
+import { PurchaseOrderItemsEntity } from 'src/orders/entities/order-items.entity';
+import { OrderEntity, PurchaseOrderStatus } from 'src/orders/entities/orders.entity';
 
 @Injectable()
 export class InboundService {
@@ -39,21 +42,75 @@ export class InboundService {
             })
             const saveInbound = await queryRunner.manager.save(inboundHeader);
 
-            const inboundItem = createInboundDto.items.map((itemDto) => {
-                const item = new InboundItemEntity();
-                item.inbound = inboundHeader;
-                item.id_item = itemDto.id_item;
-                item.id_poi = itemDto.id_poi;
-                item.qty_received = itemDto.qty_received;
+            // Loop Items untuk Save Detail & Update Inventory
+            for (const itemDto of createInboundDto.items) {
+                
+                // Simpan Inbound Item (Detail)
+                const inboundItem = queryRunner.manager.create(InboundItemEntity, {
+                    inbound: saveInbound, 
+                    id_item: itemDto.id_item,
+                    id_poi: itemDto.id_poi, 
+                    qty_received: Number(itemDto.qty_received),
+                });
+                await queryRunner.manager.save(inboundItem);
 
-                return item;
-            })
+                // Ambil ID PO Item dari DTO untuk mencari ID PO Header-nya
+                const poiId = itemDto.id_poi;
 
-            await queryRunner.manager.save(inboundItem);
+                // Cari data PO Item untuk mendapatkan id_po
+                const samplePoItem = await queryRunner.manager.findOne(PurchaseOrderItemsEntity, {
+                    where: { id_poi: poiId }
+                });
 
-            // TODO Make logic automated update qty_reserved, qty_ordered, qty_avalible
+                if (samplePoItem && samplePoItem.id_po) {
+                    const targetPoId = samplePoItem.id_po;
 
-            // comit
+                    // Ambil SEMUA detail item milik PO tersebut dari database
+                    const allPoItems = await queryRunner.manager.find(PurchaseOrderItemsEntity, {
+                        where: { id_po: targetPoId }
+                    });
+
+                    // Hitung apakah seluruh item sudah terpenuhi
+                    const isFullyReceived = allPoItems.every(item => 
+                        Number(item.qty_received) >= Number(item.qty_ordered)
+                    );
+
+                    // Update status di tabel PO Header
+                    await queryRunner.manager.update(OrderEntity, 
+                        { id_po: targetPoId }, 
+                        { po_status: isFullyReceived ? PurchaseOrderStatus.COMPLETED : PurchaseOrderStatus.RECEIVED }
+                    );
+                }
+
+                // Update Inventory berdasarkan id item
+                let inventory = await queryRunner.manager.findOne(InventoryEntity, {
+                    where: { 
+                        id_item: itemDto.id_item, 
+                    }
+                });
+
+                if (inventory) {
+                    // Update stok yang ada
+                    inventory.qty_available = Number(inventory.qty_available) + Number(itemDto.qty_received);
+                } else {
+                    // Buat baris baru jika barang belum pernah ada di lokasi tersebut
+                    inventory = queryRunner.manager.create(InventoryEntity, {
+                        id_item: itemDto.id_item,
+                        qty_available: Number(itemDto.qty_received),
+                    });
+                }
+                await queryRunner.manager.save(inventory);
+
+                // update progress PO Item
+                await queryRunner.manager.increment(PurchaseOrderItemsEntity, 
+                    { id_poi: itemDto.id_poi }, 
+                    "qty_received", 
+                    itemDto.qty_received
+                );
+            }
+
+
+            // commit
             await queryRunner.commitTransaction();
             return saveInbound;
 
@@ -65,7 +122,6 @@ export class InboundService {
             // Disconnect DB
             await queryRunner.release();
         }
-        
         
     }
 
