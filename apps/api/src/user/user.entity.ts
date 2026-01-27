@@ -2,6 +2,8 @@ import { BeforeInsert, Column, CreateDateColumn, Entity, OneToMany, PrimaryGener
 import * as bcrypt from 'bcryptjs';
 import { InboundEntity } from "../inbound/entities/inbound.entity";
 import { OrderEntity } from "../orders/entities/orders.entity";
+import { SalesOrderEntity } from "../sales/entities/sales-order.entity";
+import { OutboundEntity } from "../outbound/entities/outbound.entity";
 
 export enum UserRole {
   ADMIN = 'ADMIN',
@@ -66,4 +68,10 @@ export class UserEntity {
 
     @OneToMany(() => InboundEntity, (inbound) => inbound.receivedBy)
     inbounds: InboundEntity[];  
+
+    @OneToMany(() => SalesOrderEntity, (sale) => sale.createdBy)
+    sales: SalesOrderEntity[];  
+
+    @OneToMany(() => OutboundEntity, (outbound) => outbound.shipped_by)
+    outbounds: OutboundEntity[];  
 }

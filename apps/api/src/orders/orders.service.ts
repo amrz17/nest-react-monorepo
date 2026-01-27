@@ -17,13 +17,6 @@ export class OrdersService {
 
   // Create Order   
    async createOrder(createOrderDto: CreateOrderDto): Promise<OrderEntity> {
-      // // Create a new order entity
-      // const newOrder = new OrderEntity();
-      // // Assign the DTO properties to the new order entity
-      // Object.assign(newOrder, createOrderDto);
-
-      // // Save the new order to the database
-      // return this.orderRepository.save(newOrder);
 
       const queryRunner = this.dataSource.createQueryRunner();
       await queryRunner.connect();
@@ -45,17 +38,6 @@ export class OrdersService {
          });
          const savePO = await queryRunner.manager.save(poHeader);
 
-
-         // Simpan Detail ke PO Item
-         // const poItems = createOrderDto.items.map((item) => {
-         //    return queryRunner.manager.create(PurchaseOrderItemsEntity, {
-         //       purchaseOrder: savePO,
-         //       item: { id_item: item.id_item },
-         //       qty_ordered: item.qty_ordered,
-         //       price_per_unit: item.price_per_unit,
-         //    });
-         // });
-
          const poItems = createOrderDto.items.map((itemDto) => {
             const item = new PurchaseOrderItemsEntity();
             item.purchaseOrder = savePO;
@@ -70,6 +52,7 @@ export class OrdersService {
             return item;
          })
          await queryRunner.manager.save(poItems);
+
 
          // commit 
          await queryRunner.commitTransaction()
@@ -93,14 +76,6 @@ export class OrdersService {
          }
       });
    }
-   
-   // // Get Orders by User ID
-   // async getOrdersByUserId(id_user: string): Promise<OrderEntity[]> {
-   //    return this.orderRepository.find({
-   //        where: { id_user }
-   //    });
-   // }
-
 
    // Update Order
    async updateOrder(id_po: string, updateOrderDto: UpdateOrderDto): Promise<OrderEntity> {

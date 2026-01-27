@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { InboundEntity } from './entities/inbound.entity';
+import { InboundEntity, StatusInbound } from './entities/inbound.entity';
 import { DataSource, Repository } from 'typeorm';
 import { CreateInboundDto } from './dto/create-inbound.dto';
 import { UpdateInboundDto } from './dto/update-inbound.dto';
@@ -145,7 +145,7 @@ export class InboundService {
             });
 
             if (!inbound) throw new NotFoundException('Inbound not found');
-            if (inbound.status_inbound === 'CANCELED') throw new BadRequestException('Already cancelled');
+            if (inbound.status_inbound === StatusInbound.CANCELED) throw new BadRequestException('Already cancelled');
 
             // Loop Items untuk Mengembalikan Stok
             for (const item of inbound.items) {
@@ -166,7 +166,7 @@ export class InboundService {
             }
 
             // Ubah status Inbound Header
-            inbound.status_inbound = 'CANCELED';
+            inbound.status_inbound = StatusInbound.CANCELED;
             await queryRunner.manager.save(inbound);
 
             // Update kembali status PO Header ke 'PARTIAL' atau 'OPEN'

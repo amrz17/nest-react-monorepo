@@ -31,7 +31,9 @@ export class InboundController {
     @Post('cancel/:id_inbound')
     async cancelInbound(
         @Param('id_inbound', new ParseUUIDPipe()) id_inbound: string,
-    ): Promise<any> {
-        await this.inboundService.cancelInbound(id_inbound);
+    ): Promise<IInboundResponse> {
+        const cancel = await this.inboundService.cancelInbound(id_inbound);
+
+        return await this.inboundService.generatedOrderResponse(cancel);
     }
 }

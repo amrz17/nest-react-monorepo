@@ -54,7 +54,7 @@ export class InboundEntity {
         default: StatusInbound.RECEIVED,
         nullable: false
     })
-    status_inbound: string;
+    status_inbound: StatusInbound;
 
     @UpdateDateColumn()
     last_update: Date;

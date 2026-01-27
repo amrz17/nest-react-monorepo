@@ -2,6 +2,8 @@ import { PurchaseOrderItemsEntity } from "../orders/entities/order-items.entity"
 import { InventoryEntity } from "../inventory/inventory.entity";
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 import { InboundItemEntity } from "../inbound/entities/inbound-item.entity";
+import { OutboundItemEntity } from "../outbound/entities/outbound-item.entity";
+import { SaleOrderItemsEntity } from "../sales/entities/sale-order-items.entity";
 
 @Entity({name: 'items'})
 export class ItemsEntity {
@@ -32,6 +34,12 @@ export class ItemsEntity {
 
     @OneToMany(() => InboundItemEntity, (inboundItem) => inboundItem.items) 
     inbound: InboundItemEntity[];
+
+    @OneToMany(() => SaleOrderItemsEntity, (soi) => soi.item) 
+    saleItem: SaleOrderItemsEntity[];
+
+    @OneToMany(() => OutboundItemEntity, (outboundItem) => outboundItem.Items) 
+    outbound: OutboundItemEntity[];
 
     @CreateDateColumn()
     created_at: Date;

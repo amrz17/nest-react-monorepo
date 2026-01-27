@@ -2,6 +2,7 @@ import { CustomerEntity } from "../../customers/customer.entity";
 import { SaleOrderItemsEntity } from "./sale-order-items.entity";
 import { UserEntity } from "../../user/user.entity";
 import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { OutboundEntity } from "../../outbound/entities/outbound.entity";
 
 export enum SalesOrderStatus {
   PENDING = 'PENDING',     // Pesanan baru masuk dari customer/sales
@@ -32,15 +33,11 @@ export class SalesOrderEntity {
     @Column()
     date_so: Date;
 
+    @Column()
+    id_customer: string;
     @ManyToOne(() => CustomerEntity)
     @JoinColumn( { name: 'id_customer' } )
     customer: UserEntity;
-
-    @Column()
-    customer_address: string;
-
-    @Column()
-    customer_phone: string;
 
     @Column()
     total_amount: number;
@@ -51,11 +48,20 @@ export class SalesOrderEntity {
     @Column()
     note: string;
 
+    @Column()
+    id_user: string;
+    @ManyToOne(() => UserEntity, (user) => user.sales)
+    @JoinColumn({ name: 'id_user' })
+    createdBy: UserEntity;
+
     @UpdateDateColumn()
     updated_at: Date;
 
     @CreateDateColumn()
     created_at: Date;
+
+    @OneToMany(() => OutboundEntity, (out) => out.sales_order, { cascade: true })
+    outbounds: OutboundEntity[];
 
     @OneToMany(() => SaleOrderItemsEntity, (item) => item.sales_order, { cascade: true })
     items: SaleOrderItemsEntity[];

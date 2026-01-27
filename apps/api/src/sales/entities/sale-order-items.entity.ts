@@ -1,6 +1,7 @@
 import { ItemsEntity } from "../../items/items.entity";
 import { SalesOrderEntity } from "./sales-order.entity";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { OutboundItemEntity } from "../../outbound/entities/outbound-item.entity";
+import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity( { name: 'sale_order_items' } )
 export class SaleOrderItemsEntity {
@@ -8,10 +9,14 @@ export class SaleOrderItemsEntity {
     @PrimaryGeneratedColumn('uuid')
     id_soi: string;
 
+    @Column()
+    id_so: string;
     @ManyToOne(() => SalesOrderEntity, (salesOrder) => salesOrder.items)
     @JoinColumn({ name: 'id_so' })
     sales_order: SalesOrderEntity;
 
+    @Column()
+    id_item: string;
     @ManyToOne(() => ItemsEntity)
     @JoinColumn({ name: 'id_item' })
     item: ItemsEntity;
@@ -27,4 +32,7 @@ export class SaleOrderItemsEntity {
 
     @CreateDateColumn()
     created_at: Date;
+
+    @OneToMany(() => OutboundItemEntity, (outbound) => outbound.SaleItems)
+    outboundItem: OutboundItemEntity[];
 }
