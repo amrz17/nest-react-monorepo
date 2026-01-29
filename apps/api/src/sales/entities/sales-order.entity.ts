@@ -31,19 +31,13 @@ export class SalesOrderEntity {
     so_status: SalesOrderStatus;
     
     @Column()
-    date_so: Date;
+    date_shipped: Date;
 
     @Column()
     id_customer: string;
     @ManyToOne(() => CustomerEntity)
     @JoinColumn( { name: 'id_customer' } )
     customer: UserEntity;
-
-    @Column()
-    total_amount: number;
-
-    @Column()
-    status: string;
 
     @Column()
     note: string;

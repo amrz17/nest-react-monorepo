@@ -1,28 +1,24 @@
 import { Type } from "class-transformer";
-import { IsArray, IsDate, IsNumber, IsOptional, IsString, ValidateNested } from "class-validator";
+import { IsArray, IsDate, IsNumber, IsOptional, IsString, IsUUID, ValidateNested } from "class-validator";
 import { CreateSaleItemDto } from "./create-saleItem.dto";
 
-export class CreateSaleOrder {
+export class CreateSaleDTO {
+    @IsOptional()
     @IsString()
     so_number: string;
 
     @IsString()
     so_status: string;
     
+    @Type(() => Date)
     @IsDate()
-    date_so: Date;
+    date_shipped: Date;
 
-    @IsString()
-    customer_address: string;
+    @IsUUID()
+    id_user: string;
 
-    @IsString()
-    customer_phone: string;
-
-    @IsNumber()
-    total_amount: number;
-
-    @IsString()
-    status: string;
+    @IsUUID()
+    id_customer: string;
 
     @IsOptional()
     @IsString()

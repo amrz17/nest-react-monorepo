@@ -24,8 +24,14 @@ export class SaleOrderItemsEntity {
     @Column({ type: 'int' })
     qty_ordered: number;
 
+    @Column({ type: 'int' })
+    qty_shipped: number;
+
     @Column({ type: 'decimal', precision: 10, scale: 2 })
-    price_at_order: number;
+    price_per_unit: number;
+
+    @Column({ type: 'decimal', precision: 10, scale: 2 })
+    total_price : number;
 
     @UpdateDateColumn()
     last_updated: Date;
