@@ -38,7 +38,7 @@ export class OutboundEntity {
     id_customer: string;
     @ManyToOne(() => CustomerEntity)
     @JoinColumn( { name: 'id_customer' } )
-    customer: UserEntity;
+    customer: CustomerEntity;
 
     @Column()
     shipped_at: Date;
