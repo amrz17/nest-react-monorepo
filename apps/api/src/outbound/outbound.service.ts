@@ -35,7 +35,6 @@ export class OutboundService {
                 shipped_at: createOutboundDto.shipped_at,
                 carrier_name: createOutboundDto.carrier_name,
                 tracking_number: createOutboundDto.tracking_number,
-                total_items: createOutboundDto.total_items,
                 status_outbound: createOutboundDto.status_inbound,
                 note: createOutboundDto.note
             })
@@ -52,19 +51,45 @@ export class OutboundService {
                 })
                 await queryRunner.manager.save(outboundItem);
 
+
+                // 
+                const inventory = await queryRunner.manager.findOne(InventoryEntity, {
+                    where: {
+                        id_item: itemDto.id_item
+                    }
+                })
+
+                if (!inventory || Number(inventory.qty_reserved) < Number(itemDto.qty_shipped)) {
+                    throw new BadRequestException(`Stok di lokasi tersebut tidak mencukupi atau tidak ditemukan!`);
+                }
+
+                //
+                await queryRunner.manager.increment(SaleOrderItemsEntity, 
+                    { id_soi: itemDto.id_soi },
+                    "qty_shipped",
+                    itemDto.qty_shipped
+                );
+
+                await queryRunner.manager.decrement(InventoryEntity, 
+                    { id_inventory: inventory.id_inventory },
+                    "qty_reserved",
+                    itemDto.qty_shipped
+                );
+
                 //
                 const soiId = itemDto.id_soi;
 
                 const soItem = await queryRunner.manager.findOne(SaleOrderItemsEntity, {
-                    where: { id_soi: soiId}
+                    where: { id_soi: soiId},
+                    relations: ['sales_order']
                 });
 
                 if (soItem && soItem.id_so) {
-                    const poId = soItem.id_so;
+                    const soId = soItem.sales_order.id_so;
 
                     //
                     const allSoItems = await queryRunner.manager.find(SaleOrderItemsEntity, {
-                        where: { id_so: poId }
+                        where: { id_so: soId }
                     });
 
                     // 
@@ -74,38 +99,11 @@ export class OutboundService {
 
                     //
                     await queryRunner.manager.update(SalesOrderEntity, 
-                        { id_so: soiId },
+                        { id_so: soId },
                         { so_status: isFullyShipped ? SalesOrderStatus.COMPLETED : SalesOrderStatus.SHIPPED }
 
                     );
                 }
-
-                    // 
-                    let inventory = await queryRunner.manager.findOne(InventoryEntity, {
-                        where: {
-                            id_item: itemDto.id_item
-                        }
-                    })
-
-                    if (inventory) {
-                        //
-                        inventory.qty_reserved = Number(inventory.qty_reserved) - Number(itemDto.qty_shipped);
-                    } else {
-                        //
-                        inventory = await queryRunner.manager.create(InventoryEntity, {
-                            id_item: itemDto.id_item,
-                            qty_reserved: Number(itemDto.qty_shipped)
-                        })
-                    }
-
-                    await queryRunner.manager.save(inventory);
-
-                    //
-                    await queryRunner.manager.increment(SaleOrderItemsEntity, 
-                        { id_soi: itemDto.id_soi },
-                        "qty_reserved",
-                        itemDto.qty_shipped
-                    );
             }
 
             // 

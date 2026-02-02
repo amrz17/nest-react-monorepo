@@ -23,7 +23,7 @@ export class InboundService {
     // create 
     async createInbound(
         createInboundDto: CreateInboundDto
-    ): Promise<any> {
+    ): Promise<InboundEntity> {
         const queryRunner = this.dataSource.createQueryRunner();
         // Connect TO DB
         await queryRunner.connect();

@@ -1,4 +1,4 @@
-import { IsArray, IsDate, IsNumber, IsOptional, IsString, IsUUID, ValidateNested } from "class-validator";
+import { IsArray, IsDate, IsDateString, IsNumber, IsOptional, IsString, IsUUID, ValidateNested } from "class-validator";
 import { StatusOutbound } from "../entities/outbound.entity";
 import { Type } from "class-transformer";
 import { CreateOutboundItemDto } from "./create-ouboundItem.dto";
@@ -16,8 +16,8 @@ export class CreateOutbounddDto {
     @IsUUID()
     id_customer: string;
 
-    @IsDate()
-    shipped_at: Date;
+    @IsDateString()
+    shipped_at: string;
 
     @IsString()
     carrier_name: string;
@@ -27,9 +27,6 @@ export class CreateOutbounddDto {
 
     @IsString()
     status_inbound: StatusOutbound;
-
-    @IsNumber()
-    total_items: number;
 
     @IsOptional()
     @IsString()

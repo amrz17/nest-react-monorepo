@@ -61,30 +61,25 @@ export class SalesService {
                 // id so
                 const soiId = itemDto.id_item;
 
-                const reservedItem = await queryRunner.manager.find(InventoryEntity, {
+                const reservedItem = await queryRunner.manager.findOne  (InventoryEntity, {
                     where: { id_item: soiId }
                 })
 
-                if (reservedItem) {
-                    // Update Inventory berdasarkan id item
-                    let inventory = await queryRunner.manager.findOne(InventoryEntity, {
-                        where: { 
-                            id_item: itemDto.id_item, 
-                        }
-                    });
-
-                    if (inventory) {
-                        // Update qty reserved 
-                        inventory.qty_reserved = Number(inventory.qty_reserved) + Number(itemDto.qty_ordered);
-                    } else {
-                        // Buat baris baru jika barang belum pernah ada di lokasi tersebut
-                        inventory = queryRunner.manager.create(InventoryEntity, {
-                            id_item: itemDto.id_item,
-                            qty_available: Number(itemDto.qty_ordered),
-                        });
-                    }
-                    await queryRunner.manager.save(inventory);
+                if (!reservedItem || Number(reservedItem.qty_reserved) < Number(itemDto.qty_shipped)) {
+                    throw new BadRequestException(`Stok reserved tidak mencukupi untuk item ${itemDto.id_item}!`);
                 }
+
+                await queryRunner.manager.decrement(InventoryEntity, 
+                    { id_inventory: reservedItem.id_inventory },
+                    "qty_available",
+                    itemDto.qty_ordered
+                );
+
+                await queryRunner.manager.increment(InventoryEntity, 
+                    { id_inventory: reservedItem.id_inventory },
+                    "qty_reserved",
+                    itemDto.qty_ordered
+                );
             }
 
             // commit 

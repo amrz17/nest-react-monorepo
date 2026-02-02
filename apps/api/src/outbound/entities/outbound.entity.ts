@@ -49,9 +49,6 @@ export class OutboundEntity {
     @Column()
     tracking_number: string;
 
-    @Column()
-    total_items: number;
-
     @Column({
         type: 'enum',
         enum: StatusOutbound,
