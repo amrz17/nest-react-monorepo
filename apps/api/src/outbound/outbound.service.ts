@@ -198,7 +198,12 @@ export class OutboundService {
         );
     }
 
-
+    //
+    async getAllOutbound(): Promise<OutboundEntity[]> {
+        return await this.outboundRepo.find({
+            relations: ['items', 'customer', 'shipped_by', 'sales_order']
+        });
+    }
 
 
    // function to generate order response
