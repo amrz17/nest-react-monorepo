@@ -9,15 +9,15 @@ import { createActionColumn } from "@/components/action-column"
 import { baseLocationColumns } from "@/layout/TableHeaderLayout"
 
 import { toast } from "sonner"
-import type { LocationOrder } from "@/types/location.type"
 import { fetchLocation } from "@/api/location.api"
 import { useLocation } from "@/hooks/use-location"
 import { LocationForm } from "./location-form"
+import type { LocationPayload } from "@/schemas/schema"
 
 export default function LocationTabContent() {
   const [data, setData] = useState<any>([])
   const [open, setOpen] = useState(false)
-  const [selectedItem, setSelectedItem] = useState<LocationOrder | null>(null)
+  const [selectedItem, setSelectedItem] = useState<LocationPayload | null>(null)
   const [mode, setMode] = useState<"create" | "edit">("create")
   
   const { deleteLocation } = useLocation()
@@ -32,7 +32,7 @@ export default function LocationTabContent() {
 
   // ... (handleEdit, handleDelete, confirmDelete logic sama seperti kode Anda)
   // Handle Edit item
-  const handleEdit = async (loc: LocationOrder) => {
+  const handleEdit = async (loc: LocationPayload) => {
     await setMode("edit")
     await setSelectedItem(loc)
     await setOpen(true)
@@ -40,7 +40,7 @@ export default function LocationTabContent() {
 
   const columns = [
     ...baseLocationColumns,
-    createActionColumn<LocationOrder>([
+    createActionColumn<LocationPayload>([
       {
         label: "Edit",
         icon: <NotebookPenIcon className="mr-2 h-4 w-4" />,
@@ -50,7 +50,7 @@ export default function LocationTabContent() {
         label: "Delete",
         icon: <TrashIcon className="mr-2 h-4 w-4" />,
         destructive: true,
-        onClick: (loc) => handleDelete(loc.id_location),
+        onClick: (loc) => handleDelete(loc.id_location!),
       },
     ]),
   ]

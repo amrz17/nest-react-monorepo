@@ -11,13 +11,13 @@ import { baseInventoryColumns } from "@/layout/TableHeaderLayout"
 import { toast } from "sonner"
 import { fetchInventory } from "@/api/inventory.api"
 import { useInventory } from "@/hooks/use-inventory"
-import type { InventoryOrder } from "@/types/inventory.type"
 import { InventoryForm } from "./inventory-form"
+import type { InventoryPayload } from "@/schemas/schema"
 
 export default function InventoryTabContent() {
   const [data, setData] = useState<any[]>([])
   const [open, setOpen] = useState(false)
-  const [selectedItem, setSelectedItem] = useState<InventoryOrder | null>(null)
+  const [selectedItem, setSelectedItem] = useState<InventoryPayload | null>(null)
   const [mode, setMode] = useState<"create" | "edit">("create")
   
   const { deleteInventory } = useInventory() 
@@ -32,7 +32,7 @@ export default function InventoryTabContent() {
 
   // ... (handleEdit, handleDelete, confirmDelete logic sama seperti kode Anda)
   // Handle Edit item
-  const handleEdit = async (inv: InventoryOrder) => {
+  const handleEdit = async (inv: InventoryPayload) => {
     await setMode("edit")
     await setSelectedItem(inv)
     await setOpen(true)
@@ -40,7 +40,7 @@ export default function InventoryTabContent() {
 
   const columns = [
     ...baseInventoryColumns,
-    createActionColumn<InventoryOrder>([
+    createActionColumn<InventoryPayload>([
       {
         label: "Edit",
         icon: <NotebookPenIcon className="mr-2 h-4 w-4" />,
@@ -50,7 +50,7 @@ export default function InventoryTabContent() {
         label: "Delete",
         icon: <TrashIcon className="mr-2 h-4 w-4" />,
         destructive: true,
-        onClick: (inv) => handleDelete(inv.id_inventory),
+        onClick: (inv) => handleDelete(inv.id_inventory!),
       },
     ]),
   ]

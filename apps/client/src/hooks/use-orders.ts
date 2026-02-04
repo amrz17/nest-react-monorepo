@@ -1,4 +1,4 @@
-import { createOrderApi, deleteOrderApi, updateOrderApi } from "@/api/order.api"
+import { createOrderApi, deleteOrderApi, updateOrderApi } from "@/api/purchase-order.api"
 import type { OrderPayload } from "@/schemas/schema"
 import { useState } from "react"
 

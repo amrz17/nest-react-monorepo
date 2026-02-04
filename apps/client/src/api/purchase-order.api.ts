@@ -1,9 +1,8 @@
-import type { PurchaseOrder } from "@/components/columns"
 import api from "./axios"
 import type { OrderPayload } from "@/schemas/schema"
 
 // Get All Orders
-export const fetchOrders = async (): Promise<PurchaseOrder[]> => {
+export const fetchOrders = async (): Promise<OrderPayload[]> => {
   const response = await api.get("/order")
   return response.data.orders
 }
@@ -11,12 +10,12 @@ export const fetchOrders = async (): Promise<PurchaseOrder[]> => {
 // Create Order
 export const createOrderApi = (
   payload: OrderPayload
-): Promise<PurchaseOrder> => api.post("/order", payload)
+): Promise<OrderPayload> => api.post("/order", payload)
 
 // Update Order
 export const updateOrderApi = (id: string, 
   payload: OrderPayload
-): Promise<PurchaseOrder> => api.put(`/order/update/${id}`, payload)
+): Promise<OrderPayload> => api.put(`/order/update/${id}`, payload)
 
 // Delete Order
 export const deleteOrderApi = (

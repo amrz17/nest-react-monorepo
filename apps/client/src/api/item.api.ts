@@ -1,6 +1,5 @@
 import type { ItemPayload } from "@/schemas/schema"
 import api from "./axios"
-import type { ItemsOrder } from "@/types/item.type"
 
 export const fetchItems = async (): Promise<any> => {
     const response = await api.get("/items")
@@ -10,12 +9,12 @@ export const fetchItems = async (): Promise<any> => {
 
 export const createItemApi = (
     payload: ItemPayload
-): Promise<ItemsOrder> => api.post("/items", payload) 
+): Promise<ItemPayload> => api.post("/items", payload) 
 
 export const updateItemApi = (
     id: string,
     payload: ItemPayload
-): Promise<ItemsOrder> => api.put(`/items/update/${id}`, payload) 
+): Promise<ItemPayload> => api.put(`/items/update/${id}`, payload) 
 
 export const deleteItemApi = (
     id: string

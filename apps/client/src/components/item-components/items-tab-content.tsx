@@ -9,13 +9,13 @@ import { createActionColumn } from "@/components/action-column"
 import { baseItemColumns } from "@/layout/TableHeaderLayout"
 import { fetchItems } from "@/api/item.api"
 import { useItems } from "@/hooks/use-item"
-import type { ItemsOrder } from "@/types/item.type"
 import { toast } from "sonner"
+import type { ItemPayload } from "@/schemas/schema"
 
 export default function ItemsTabContent() {
   const [data, setData] = useState<any>([])
   const [open, setOpen] = useState(false)
-  const [selectedItem, setSelectedItem] = useState<ItemsOrder | null>(null)
+  const [selectedItem, setSelectedItem] = useState<ItemPayload | null>(null)
   const [mode, setMode] = useState<"create" | "edit">("create")
   
   const { deleteItem } = useItems()
@@ -27,7 +27,7 @@ export default function ItemsTabContent() {
     setData(items)
   }
 
-  const handleEdit = async (item: ItemsOrder) => {
+  const handleEdit = async (item: ItemPayload) => {
     await setMode("edit")
     await setSelectedItem(item)
     await setOpen(true)
@@ -35,7 +35,7 @@ export default function ItemsTabContent() {
 
   const columns = [
     ...baseItemColumns,
-    createActionColumn<ItemsOrder>([
+    createActionColumn<ItemPayload>([
       {
         label: "Edit",
         icon: <NotebookPenIcon className="mr-2 h-4 w-4" />,
@@ -45,7 +45,7 @@ export default function ItemsTabContent() {
         label: "Delete",
         icon: <TrashIcon className="mr-2 h-4 w-4" />,
         destructive: true,
-        onClick: (item) => handleDelete(item.id_item),
+        onClick: (item) => handleDelete(item.id_item!),
       },
     ]),
   ]

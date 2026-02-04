@@ -3,24 +3,24 @@ import { Card, CardDescription, CardFooter, CardHeader } from "@/components/ui/c
 import DahsboardLayout from "@/layout/DashboardLayout"
 import { DataTable } from "@/components/data-table"
 
-import { columnsOrders, type PurchaseOrder  } from "@/components/columns"
+import { columnsOrders } from "@/components/columns"
 import { useEffect, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { ResponsiveDialogDrawer } from "@/components/drawer-form"
 import { OrderForm  } from "@/components/order-form"
-import { fetchOrders } from "@/api/order.api"
+import { fetchOrders } from "@/api/purchase-order.api"
 import { toast } from "sonner"
 import { useOrders } from "@/hooks/use-orders"
 import { ConfirmDeleteDialog } from "@/components/dialog-delete"
 import { PlusCircle } from "lucide-react"
-// import { Separator } from "@radix-ui/react-dropdown-menu"
+import type { OrderPayload } from "@/schemas/schema"
 
 
 const Purchase = () => {
 
-  const [data, setData] = useState<PurchaseOrder[]>([])
+  const [data, setData] = useState<OrderPayload[]>([])
   const [open, setOpen] = useState(false)
-  const [selectedOrder, setSelectedOrder] = useState<PurchaseOrder | null>(null)
+  const [selectedOrder, setSelectedOrder] = useState<OrderPayload | null>(null)
   const [mode, setMode] = useState<"create" | "edit">("create")
   const { deleteOrder } = useOrders()
 
@@ -60,7 +60,7 @@ const Purchase = () => {
   }, [])
 
   // Handle Edit Order
-  const handleEdit = (order: PurchaseOrder) => {
+  const handleEdit = (order: OrderPayload) => {
     setMode("edit")
     setSelectedOrder(order)
     setOpen(true)

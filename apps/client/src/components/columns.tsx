@@ -12,42 +12,13 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Badge } from "./ui/badge"
-
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
-export type PurchaseOrder = {
-  id_po?: string,
-  po_number?: string,
-  id_supplier: string
-  supplier: {
-    name: string;
-  };
-  id_user: string
-  createdBy: {
-    name: string;
-  };
-  expected_delivery_date: string
-  po_status: string
-  note?: string
-  items: {
-    id_item: string
-    qty_ordered: number
-    qty_received?: number
-    price_per_unit: number
-    total_price?: number
-    item?: {
-      name: string
-    }
-  }[]
-  last_update: string
-  created_at: string
-}
+import type { OrderPayload } from "@/schemas/schema"
 
 // Define the columns for the data table.
 export const columnsOrders = ( 
-  onEdit: (order: PurchaseOrder) => void,
+  onEdit: (order: OrderPayload) => void,
   onDelete: (id_po: string) => void
-): ColumnDef<PurchaseOrder>[] => [
+): ColumnDef<OrderPayload>[] => [
   {
     accessorKey: "supplier.name",
     header: "Company Supplier",

@@ -10,19 +10,19 @@ import { useEffect, useState } from "react"
 import { NotebookPenIcon, PlusCircle, TrashIcon } from "lucide-react"
 import { baseItemColumns } from "@/layout/TableHeaderLayout"
 import { createActionColumn } from "@/components/action-column"
-import type { ItemsOrder } from "@/types/item.type"
 import { ResponsiveDialogDrawer } from "@/components/drawer-form"
 import { Button } from "@/components/ui/button"
 import { ItemForm } from "@/components/item-components/item-form"
 import { useItems } from "@/hooks/use-item"
 import { toast } from "sonner"
 import { ConfirmDeleteDialog } from "@/components/dialog-delete"
+import type { ItemPayload } from "@/schemas/schema"
 
 export default function Inventory() {
   const [data, setData] = useState<any>([])
 
   const [open, setOpen] = useState(false)
-  const [selectedItem, setSelectedItem] = useState<ItemsOrder | null>(null)
+  const [selectedItem, setSelectedItem] = useState<ItemPayload | null>(null)
   const [mode, setMode] = useState<"create" | "edit">("create")
 
   const { deleteItem } = useItems()
@@ -37,7 +37,7 @@ export default function Inventory() {
   }
 
   // Handle Edit item
-  const handleEdit = async (item: ItemsOrder) => {
+  const handleEdit = async (item: ItemPayload) => {
     await setMode("edit")
     await setSelectedItem(item)
     await setOpen(true)
@@ -65,7 +65,7 @@ export default function Inventory() {
 
   const columns = [
   ...baseItemColumns,
-  createActionColumn<ItemsOrder>([
+  createActionColumn<ItemPayload>([
     {
       label: "Edit",
       icon: <NotebookPenIcon className="mr-2 h-4 w-4" />,
@@ -75,7 +75,7 @@ export default function Inventory() {
       label: "Delete",
       icon: <TrashIcon className="mr-2 h-4 w-4" />,
       destructive: true,
-      onClick: (item) => handleDelete(item.id_item),
+      onClick: (item) => handleDelete(item.id_item!),
     },
   ]),
 ]

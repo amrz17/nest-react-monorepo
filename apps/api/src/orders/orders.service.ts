@@ -71,6 +71,7 @@ export class OrdersService {
    // Get All Orders
    async getAllOrders(): Promise<OrderEntity[]> {
       return this.orderRepository.find({
+         relations: ['createdBy', 'supplier', 'items.item'],
          order: {
             created_at: 'DESC'
          }
