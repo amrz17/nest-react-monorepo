@@ -2,11 +2,19 @@
 import { z } from "zod"
 
 export const orderSchema = z.object({
-  po_code: z.string().min(1, "PO Code is required"),
+  po_number: z.string().optional().or(z.literal("")),
+  id_supplier: z.string().min(1, "Supplier is required"),
   id_user: z.string().min(1, "Company is required"),
-  date_po: z.string().min(1, "Date is required"),
+  expected_delivery_date: z.string().min(1, "Date is required"),
   po_status: z.string().min(1, "Status is required"),
   note: z.string().optional(),
+  items: z.array(
+    z.object({
+      id_item: z.string().min(1, "Item ID is required"),
+      qty_ordered: z.number().min(1, "Quantity must be at least 1"),
+      price_per_unit: z.number().min(0, "Price must be at least 0"),
+    }),
+  )
 })
 
 export type OrderPayload = z.infer<typeof orderSchema>
