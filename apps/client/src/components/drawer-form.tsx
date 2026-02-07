@@ -70,7 +70,6 @@ export function ResponsiveDialogDrawer({
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>{trigger}</DrawerTrigger>
-      // TODO : Make drawer scorllable
       <DrawerContent> 
         <DrawerHeader className="text-left">
           <DrawerTitle>{title}</DrawerTitle>
