@@ -1,5 +1,4 @@
 // schemas/order.schema.ts
-import { Lasso, LassoSelect } from "lucide-react"
 import { z } from "zod"
 
 // Purchase Order Schema
@@ -37,9 +36,16 @@ export type OrderPayload = z.infer<typeof orderSchema>
 
 // Sale Order Schema
 export const saleOrderSchema = z.object({
+  id_so: z.string().optional(),
   so_number: z.string().optional().or(z.literal("")),
   id_user: z.string().min(1, "User ID is required"),
+  createdBy: z.object({
+    name: z.string().optional()
+  }).optional(),
   id_customer: z.string().min(1, "Customer ID is required"),
+  customer: z.object({
+    name: z.string().optional()
+  }).optional(),
   so_status: z.string().min(1, "Status is required"),
   date_shipped: z.string().optional().or(z.literal("")),
   note: z.string().optional(),
@@ -47,6 +53,7 @@ export const saleOrderSchema = z.object({
     z.object({
       id_item: z.string().min(1, "Item ID is required"),
       qty_ordered: z.number().min(1, "Quantity must be at least 1"),
+      qty_shipped: z.number().optional(),
       price_per_unit: z.number().min(0, "Price must be at least 0"),
     }),
   )

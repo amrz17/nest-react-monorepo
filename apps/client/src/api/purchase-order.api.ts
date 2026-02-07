@@ -21,3 +21,8 @@ export const updateOrderApi = (id: string,
 export const deleteOrderApi = (
   id: string,
 ): Promise<void> => api.delete(`/order/delete/${id}`)
+
+// Cancel Purchase Order
+export const cancelPurchaseOrderApi = (
+  id: string,
+): Promise<void> => api.delete(`/order/cancel/${id}`)

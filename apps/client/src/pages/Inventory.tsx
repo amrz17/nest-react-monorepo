@@ -15,7 +15,6 @@ export default function InventoryPage() {
       <div className="flex flex-1 flex-col p-4 md:p-6">
         <div className="flex flex-col gap-4">
           
-          {/* NAVIGASI TABS */}
           <TableTabsList>
             <TableTabTrigger 
               isActive={activeTab === "inventory"} 
@@ -37,7 +36,6 @@ export default function InventoryPage() {
             </TableTabTrigger>
           </TableTabsList>
 
-          {/* KONTEN DINAMIS */}
           <div className="mt-2 transition-all">
             {activeTab === "inventory" && <InventoryTabContent />}
             {activeTab === "item" && <ItemsTabContent />}

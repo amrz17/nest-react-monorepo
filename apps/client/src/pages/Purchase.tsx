@@ -3,7 +3,7 @@ import { Card, CardDescription, CardFooter, CardHeader } from "@/components/ui/c
 import DahsboardLayout from "@/layout/DashboardLayout"
 import { DataTable } from "@/components/data-table"
 
-import { columnsOrders } from "@/components/columns"
+import { columnsOrders } from "@/components/columns-purchase-order"
 import { useEffect, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { ResponsiveDialogDrawer } from "@/components/drawer-form"
