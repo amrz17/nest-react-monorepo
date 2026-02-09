@@ -96,3 +96,35 @@ export const locationSchema = z.object({
 })
 
 export type LocationPayload = z.infer<typeof locationSchema>
+
+// Inbound Schema
+export const inboundSchema = z.object({
+  id_inbound: z.string().optional(),
+  inbound_number: z.string().optional(),
+  id_po: z.string().min(1, "Purchase Order ID is required"),
+  purchaseOrder: z.object({
+    po_number: z.string().optional()
+  }).optional(),
+  id_user: z.string().min(1, "User ID is required"),
+  receivedBy: z.object({
+    name: z.string().optional()
+  }).optional(),
+  id_supplier: z.string().min(1, "Supplier ID is required"),
+  supplierName: z.object({
+    name: z.string().optional()
+  }).optional(),
+  received_at: z.string().min(1, "Received date is required"),
+  status_inbound: z.enum(['CANCELED', 'DRAFT', 'PARTIAL', 'RECEIVED']).optional(),
+  note: z.string().optional(),
+  items: z.array(
+    z.object({
+      id_item: z.string().min(1, "Item ID is required"),
+      id_poi: z.string().min(1, "Purchase Order Item ID is required"),
+      qty_received: z.number().min(1, "Quantity received must be at least 1"),
+    }),
+  ),
+  last_update: z.string().optional(),
+  created_at: z.string().optional(),
+})
+
+export type InboundPayload = z.infer<typeof inboundSchema>
