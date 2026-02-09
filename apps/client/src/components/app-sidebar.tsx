@@ -9,6 +9,8 @@ import {
   IconPackages,
   IconReceiptDollar,
   IconSettings,
+  IconTransferIn,
+  IconTransferOut,
   IconUsers,
 } from "@tabler/icons-react"
 
@@ -46,13 +48,21 @@ const data = {
       url: "/purchase",
       icon: IconListDetails,
     },
-    // TODO : Add menu inbound
+    {
+      title: "Inbound",
+      url: "/inbound",
+      icon: IconTransferIn
+    },
     {
       title: "Sales",
       url: "/sales",
       icon: IconReceiptDollar,
     },
-    // TODO : Add menu outbound
+    {
+      title: "Outbound",
+      url: "/outbound",
+      icon: IconTransferOut
+    },
     {
       title: "Reporting",
       url: "/reporting",

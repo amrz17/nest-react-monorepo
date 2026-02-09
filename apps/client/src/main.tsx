@@ -18,6 +18,8 @@ import Dashboard from './pages/Dashboard.tsx'
 import { Toaster } from 'sonner'
 import Sales from './pages/Sales.tsx'
 import Purchase from './pages/Purchase.tsx'
+import Inbound from './pages/Inbound.tsx'
+import Outbound from './pages/Outbound.tsx'
 
 
 function Protected({ children }: { children: ReactNode }) {
@@ -63,10 +65,26 @@ const router = createBrowserRouter([
     )
   },
   {
+    path: "/inbound",
+    element: (
+      <Protected>
+        <Inbound />
+      </Protected>
+    )
+  },
+  {
     path: "/sales",
     element: (
       <Protected>
          <Sales />
+      </Protected>
+    )
+  },
+  {
+    path: "/outbound",
+    element: (
+      <Protected>
+         <Outbound />
       </Protected>
     )
   },
