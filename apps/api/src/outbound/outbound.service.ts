@@ -34,7 +34,7 @@ export class OutboundService {
                 shipped_at: createOutboundDto.shipped_at,
                 carrier_name: createOutboundDto.carrier_name,
                 tracking_number: createOutboundDto.tracking_number,
-                status_outbound: createOutboundDto.status_inbound,
+                status_outbound: createOutboundDto.status_outbound,
                 note: createOutboundDto.note
             })
 
@@ -62,7 +62,7 @@ export class OutboundService {
                     throw new BadRequestException(`Stok di lokasi tersebut tidak mencukupi atau tidak ditemukan!`);
                 }
 
-                //
+                // Update qty_shipped di SaleOrderItems dan Inventory
                 await queryRunner.manager.increment(SaleOrderItemsEntity, 
                     { id_soi: itemDto.id_soi },
                     "qty_shipped",
@@ -75,7 +75,7 @@ export class OutboundService {
                     itemDto.qty_shipped
                 );
 
-                //
+                // Update status di SalesOrder jika semua item sudah terpenuhi
                 const soiId = itemDto.id_soi;
 
                 const soItem = await queryRunner.manager.findOne(SaleOrderItemsEntity, {
@@ -86,7 +86,7 @@ export class OutboundService {
                 if (soItem && soItem.id_so) {
                     const soId = soItem.sales_order.id_so;
 
-                    //
+                    // 
                     const allSoItems = await queryRunner.manager.find(SaleOrderItemsEntity, {
                         where: { id_so: soId }
                     });
@@ -138,9 +138,9 @@ export class OutboundService {
             for (const item of outbound.items) {
                 
                 // Kurangi stok di Inventory
-                await queryRunner.manager.decrement(InventoryEntity,
+                await queryRunner.manager.increment(InventoryEntity,
                     { id_item: item.id_item },
-                    "qty_available",
+                    "qty_reserved",
                     item.qty_shipped
                 );
 

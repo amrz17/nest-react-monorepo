@@ -26,7 +26,7 @@ export class CreateOutbounddDto {
     tracking_number: string;
 
     @IsString()
-    status_inbound: StatusOutbound;
+    status_outbound: StatusOutbound;
 
     @IsOptional()
     @IsString()
