@@ -128,3 +128,36 @@ export const inboundSchema = z.object({
 })
 
 export type InboundPayload = z.infer<typeof inboundSchema>
+
+export const OutboundSchema = z.object({
+  id_outbound: z.string().optional(),
+  outbound_number: z.string().optional(),
+  id_so: z.string().min(1, "Sales Order ID is required"),
+  sales_order: z.object({
+    so_number: z.string().optional()
+  }).optional(),
+  id_user: z.string().min(1, "User ID is required"),
+  shipped_by: z.object({
+    name: z.string().optional()
+  }).optional(),
+  id_customer: z.string().min(1, "Customer ID is required"),
+  customer: z.object({
+    name: z.string().optional()
+  }).optional(),
+  shipped_at: z.string().min(1, "Shipped date is required"),
+  carrier_name: z.string().min(1, "Carrier name is required"),
+  tracking_number: z.string().min(1, "Tracking number is required"),
+  status_outbound: z.enum(['CANCELED', 'OPEN', 'SHIPPED']).optional(),
+  note: z.string().optional(),
+  items: z.array(
+    z.object({
+      id_item: z.string().min(1, "Item ID is required"),
+      id_soi: z.string().min(1, "Sales Order Item ID is required"),
+      qty_shipped: z.number().min(1, "Quantity shipped must be at least 1"),
+    }),
+  ),
+  updated_at: z.string().optional(),
+  created_at: z.string().optional(),
+})
+
+export type OutboundPayload = z.infer<typeof OutboundSchema>
