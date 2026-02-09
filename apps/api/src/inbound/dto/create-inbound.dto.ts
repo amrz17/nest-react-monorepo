@@ -20,6 +20,9 @@ export class CreateInboundDto {
     id_supplier: string;
 
     @IsString()
+    status_inbound: string;
+
+    @IsString()
     note: string;
     
     @IsArray()
