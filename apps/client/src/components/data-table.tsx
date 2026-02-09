@@ -25,8 +25,6 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-  TableTabsList,   // Import komponen baru
-  TableTabTrigger, // Import komponen baru
 } from "@/components/ui/table"
 
 interface DataTableProps<TData, TValue> {

@@ -1,45 +1,44 @@
-"use client"
-
 import { useEffect } from "react"
 import { useFieldArray, useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 
-import { orderSchema, type OrderPayload } from "@/schemas/schema"
-import { useOrders } from "@/hooks/use-orders"
+import { OutboundSchema, type OutboundPayload } from "@/schemas/schema"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
+import { useOutbound } from "@/hooks/use-outbound"
 
 type Props = {
   mode: "create" | "edit"
-  initialData?: OrderPayload | null
-  orderId?: string
+  initialData?: OutboundPayload | null
+  outboundId?: string
   onSuccess?: () => void
 }
 
-export function OrderForm({
+export function OutboundForm({
   mode,
   initialData,
-  orderId,
+  outboundId,
   onSuccess,
 }: Props) {
 
   // Initialize the form with react-hook-form and zod validation
-  const form = useForm<OrderPayload>({
-    resolver: zodResolver(orderSchema),
+  const form = useForm<OutboundPayload>({
+    resolver: zodResolver(OutboundSchema),
     defaultValues: {
-      po_number: "",
-      id_supplier: "",
+      outbound_number: "",
+      id_so: "",
+      id_customer: "",
       id_user: "",
-      expected_delivery_date: "",
-      po_status: "",
+      shipped_at: "",
+      status_outbound: "OPEN",
       note: "",
       items: [
         {
           id_item: "",
-          qty_ordered: 1,
-          price_per_unit: 0,
+          id_soi: "",
+          qty_shipped: 1,
         }
       ],
     },
@@ -60,13 +59,13 @@ export function OrderForm({
   });
 
   // Use the custom hook for order operations
-  const { createOrder, cancelOrder } = useOrders()
+  const { createOutbound, cancelOutbound } = useOutbound()
 
   useEffect(() => {
     if (mode === "edit" && initialData) {
       reset({
         ...initialData,
-        expected_delivery_date: initialData.expected_delivery_date?.slice(0, 10),
+        shipped_at: initialData.shipped_at?.slice(0, 10),
       })
     }
 
@@ -76,37 +75,48 @@ export function OrderForm({
   }, [mode, initialData, reset])
 
 
-  const onSubmit = async (values: OrderPayload) => {
+  const onSubmit = async (values: OutboundPayload) => {
     try {
       if (mode === "create") {
-        await createOrder(values)
-        toast.success("Purchase order created")
+        await createOutbound(values)
+        toast.success("Outbound order created")
       } else {
-        if (!orderId) return
-        await cancelOrder(orderId)
-        toast.success("Purchase order cancelled")
+        if (!outboundId) return
+        await cancelOutbound(outboundId)
+        toast.success("Outbound order cancelled")
       }
 
       onSuccess?.()
       reset()
-    } catch {
-      toast.error("Failed to save purchase order")
+    } catch (error: any) {
+      toast.error(error.message || "Failed to save outbound order")
+      console.log(error.message)
     }
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="grid gap-4">
       <div>
-        <Label className="mb-2">Supplier Name</Label>
+        <Label className="mb-2">Outbound Number</Label>
         <Input
-          {...register("id_supplier")}
+          {...register("outbound_number")}
           disabled={mode === "edit"}
         />
-        {errors.id_supplier && (
+        {errors.outbound_number && (
           <p className="text-sm text-red-500">
-            {errors.id_supplier.message}
+            {errors.outbound_number.message}
           </p>
         )}
+      </div>
+
+      <div>
+        <Label className="mb-2">Sale Order</Label>
+        <Input {...register("id_so")} />
+      </div>
+
+      <div>
+        <Label className="mb-2">Company Customer</Label>
+        <Input {...register("id_customer")} />
       </div>
 
       <div>
@@ -115,13 +125,23 @@ export function OrderForm({
       </div>
 
       <div>
-        <Label className="mb-2">Expected Delivery Date</Label>
-        <Input type="date" {...register("expected_delivery_date")} />
+        <Label className="mb-2">Shipped At</Label>
+        <Input type="date" {...register("shipped_at")} />
+      </div>
+
+      <div>
+        <Label className="mb-2">Carrier Name</Label>
+        <Input {...register("carrier_name")} />
+      </div>
+
+      <div>
+        <Label className="mb-2">Tracking Number</Label>
+        <Input {...register("tracking_number")} />
       </div>
 
       <div>
         <Label className="mb-2">Status</Label>
-        <Input {...register("po_status")} />
+        <Input {...register("status_outbound")} />
       </div>
 
       <div>
@@ -135,7 +155,7 @@ export function OrderForm({
       {fields.map((field, index) => (
         <div key={field.id} className="grid grid-cols-3 gap-2 border p-4 rounded-lg mb-1">
           <div>
-            <Label>Item Name</Label>
+            <Label className="mb-2">Item</Label>
             <Input {...register(`items.${index}.id_item` as const)} />
             {errors.items?.[index]?.id_item && (
               <p className="text-red-500 text-sm">{errors.items[index]?.id_item?.message}</p>
@@ -143,18 +163,18 @@ export function OrderForm({
           </div>
 
           <div>
-            <Label>Quantity</Label>
-            <Input 
-              type="number"
-              {...register(`items.${index}.qty_ordered` as const, { valueAsNumber: true })} 
-            />
+            <Label className="mb-2">SO Item</Label>
+            <Input {...register(`items.${index}.id_soi` as const)} />
+            {errors.items?.[index]?.id_soi && (
+              <p className="text-red-500 text-sm">{errors.items[index]?.id_soi?.message}</p>
+            )}
           </div>
 
           <div>
-            <Label>Price</Label>
+            <Label className="mb-2">Quantity</Label>
             <Input 
               type="number"
-              {...register(`items.${index}.price_per_unit` as const, { valueAsNumber: true })} 
+              {...register(`items.${index}.qty_shipped` as const, { valueAsNumber: true })} 
             />
           </div>
           
@@ -175,7 +195,7 @@ export function OrderForm({
                 type="button" 
                 variant="outline" 
                 size="sm"
-                onClick={() => append({ id_item: "", qty_ordered: 1, price_per_unit: 0 })}
+                onClick={() => append({ id_item: "", qty_shipped: 1, id_soi: "" })}
               >
                 Add
               </Button>

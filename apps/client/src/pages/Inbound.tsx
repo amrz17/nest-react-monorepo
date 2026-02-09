@@ -12,6 +12,7 @@ import { columnsInbound } from "@/components/columns-inbound"
 import { InboundForm } from "@/components/inbound-form"
 import { useInbound } from "@/hooks/use-inbound"
 
+// TODO : Make interface better
 const Inbound = () => {
 
   const [data, setData] = useState<InboundPayload[]>([])
