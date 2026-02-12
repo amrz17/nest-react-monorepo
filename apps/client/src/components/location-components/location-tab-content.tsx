@@ -13,6 +13,7 @@ import { fetchLocation } from "@/api/location.api"
 import { useLocation } from "@/hooks/use-location"
 import { LocationForm } from "./location-form"
 import type { LocationPayload } from "@/schemas/schema"
+import { Card, CardDescription, CardFooter, CardHeader } from "../ui/card"
 
 export default function LocationTabContent() {
   const [data, setData] = useState<any>([])
@@ -78,25 +79,41 @@ export default function LocationTabContent() {
   useEffect(() => { loadDataLocation() }, [])
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex justify-end">
-        <ResponsiveDialogDrawer
-          open={open}
-          onOpenChange={setOpen}
-          trigger={
-            <Button onClick={() => { setMode("create"); setSelectedItem(null); setOpen(true); }}>
-              <PlusCircle className="mr-2 h-4 w-4" /> Create New Location
-            </Button>
-          }
-          title={mode === "create" ? "Add Location" : "Edit Location"}
-        >
-          <LocationForm 
-            mode={mode} 
-            initialData={selectedItem} 
-            onSuccess={() => { loadDataLocation(); setOpen(false); }} 
-          />
-        </ResponsiveDialogDrawer>
-      </div>
+    <div className="flex flex-col lg:gap-4">
+      <Card className="@container/card mx-4 lg:mt-4 flex lg:flex-row p-4">
+            <div className="lg:w-3/4">
+                <CardHeader>
+                  <CardDescription className="text-xl w-full lg:text-3xl font-extrabold">
+                    Location
+                  </CardDescription>
+                </CardHeader>
+                <CardFooter className="flex-col items-start lg:gap-1.5 text-sm">
+                      Easily manage and track every location here.
+                </CardFooter>
+            </div>
+        <div className="flex justify-end">
+          <ResponsiveDialogDrawer
+            open={open}
+            onOpenChange={setOpen}
+            trigger={
+              <Button 
+                onClick={() => { setMode("create"); setSelectedItem(null); setOpen(true); }}
+                size="lg"
+                className="w-full"
+                >
+                <PlusCircle className="lg:mr-2 h-4 w-4" /> Create New Location
+              </Button>
+            }
+            title={mode === "create" ? "Add Location" : "Edit Location"}
+          >
+            <LocationForm 
+              mode={mode} 
+              initialData={selectedItem} 
+              onSuccess={() => { loadDataLocation(); setOpen(false); }} 
+            />
+          </ResponsiveDialogDrawer>
+        </div>
+      </Card>
 
       <DataTable columns={columns} data={data} />
 

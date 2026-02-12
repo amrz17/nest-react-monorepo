@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge"
 import type { InventoryPayload, ItemPayload, LocationPayload } from "@/schemas/schema"
 import type { ColumnDef } from "@tanstack/react-table"
 
@@ -27,7 +28,7 @@ export const baseItemColumns: ColumnDef<ItemPayload>[] = [
   // },
   {
     accessorKey: "created_at",
-    header: "Created At",
+    header: "Created at",
     cell: ({ getValue }) => {
     const value = getValue<string>()
 
@@ -48,10 +49,23 @@ export const baseInventoryColumns: ColumnDef<InventoryPayload>[] = [
   {
     accessorKey: "id_item",
     header: "Item Name",
-  },
-  {
-    accessorKey: "id_location",
-    header: "Location",
+    cell: ({ row }) => {
+      const items = row.original || [];
+      console.log("item",items.item.name)
+      const firstitem = items.item?.name;
+      // const extraitems = items.length - 1;
+
+      return (
+        <div className="flex items-center gap-1">
+            {firstitem || "no items"}
+          {/* {extraitems > 0 && (
+            <p>
+              +{extraitems} more
+            </p>
+          )} */}
+        </div>
+      );
+    },
   },
   {
     accessorKey: "qty_available",
@@ -60,6 +74,29 @@ export const baseInventoryColumns: ColumnDef<InventoryPayload>[] = [
   {
     accessorKey: "qty_reserved",
     header: "Reserved",
+  },
+  {
+    accessorKey: "id_location",
+    header: "Location",
+    cell: ({ row }) => {
+      const items = row.original || [];
+      console.log("item",items.location?.bin_code)
+      const firstitem = items.location?.bin_code;
+      // const extraitems = items.length - 1;
+
+      return (
+        <div className="flex items-center gap-1">
+          <Badge>
+            {firstitem || "no items"}
+          </Badge>
+          {/* {extraitems > 0 && (
+            <Badge>
+              +{extraitems} more
+            </Badge>
+          )} */}
+        </div>
+      );
+    },
   },
 ]
 

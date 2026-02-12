@@ -12,7 +12,7 @@ export default function InventoryPage() {
 
   return (
     <DahsboardLayout>
-      <div className="flex flex-1 flex-col p-4 md:p-6">
+      <div className="flex flex-1 flex-col lg:p-4 md:p-6">
         <div className="flex flex-col gap-4">
           
           <TableTabsList>
@@ -36,7 +36,7 @@ export default function InventoryPage() {
             </TableTabTrigger>
           </TableTabsList>
 
-          <div className="mt-2 transition-all">
+          <div className="lg:mt-2 transition-all">
             {activeTab === "inventory" && <InventoryTabContent />}
             {activeTab === "item" && <ItemsTabContent />}
             {activeTab === "location" && <LocationTabContent />}

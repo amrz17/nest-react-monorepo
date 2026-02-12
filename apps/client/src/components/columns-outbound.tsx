@@ -21,30 +21,30 @@ export const columnsOutbound = (
     header: "Outbound Number",
   },
   {
-    accessorKey: "items.id_item",
+    accessorKey: "id_item",
     header: "Item Name",
     cell: ({ row }) => {
       const items = row.original.items || [];
-      const firstItem = items[0]?.id_item;
+      const firstItem = items[0]?.item?.name;
       const extraItems = items.length - 1;
 
       return (
         <div className="flex items-center gap-1">
-            <Badge variant="secondary" className="text-xs">
-            {firstItem || "No Items"}
-            </Badge>
+            <p>
+              {firstItem || "No Items"}
+            </p>
           {extraItems > 0 && (
-            <Badge variant="secondary" className="text-xs">
+            <p>
               +{extraItems} more
-            </Badge>
+            </p>
           )}
         </div>
       );
     },
   },
   {
-    accessorKey: "customer.name",
-    header: "Company Customer",
+    accessorKey: "customer.customer_name",
+    header: "Customer",
   },
   {
     accessorKey: "items.qty_shipped",
@@ -56,8 +56,21 @@ export const columnsOutbound = (
     },
   },
   {
-    accessorKey: "received_at",
-    header: "Received At",
+    accessorKey: "shipped_at",
+    header: "Shipped At",
+    cell: ({ getValue }) => {
+    const value = getValue<string>()
+
+    if (!value) return "-"
+
+    return new Date(value).toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      // hour: "2-digit",
+      // minute: "2-digit",
+    })
+  },
   },
   {
     accessorKey: "status_outbound",
@@ -69,7 +82,20 @@ export const columnsOutbound = (
   },
   {
     accessorKey: "updated_at",
-    header: "Updated At",
+    header: "Last Update",
+    cell: ({ getValue }) => {
+    const value = getValue<string>()
+
+    if (!value) return "-"
+
+    return new Date(value).toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      // hour: "2-digit",
+      // minute: "2-digit",
+    })
+  },
   },
   {
   id: "actions",

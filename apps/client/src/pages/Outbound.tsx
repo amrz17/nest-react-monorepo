@@ -5,6 +5,7 @@ import { ConfirmCancelDialog } from '@/components/dialog-cancel'
 import { ResponsiveDialogDrawer } from '@/components/drawer-form'
 import { OutboundForm } from '@/components/outbound-fom'
 import { Button } from '@/components/ui/button'
+import { Card, CardDescription, CardFooter, CardHeader } from '@/components/ui/card'
 import { useOutbound } from '@/hooks/use-outbound'
 import DashboardLayout from '@/layout/DashboardLayout'
 import type { OutboundPayload } from '@/schemas/schema'
@@ -58,13 +59,24 @@ const Outbound = () => {
   return (
     <DashboardLayout>
         <section className="flex flex-1 flex-col mt-4">
-        <div className="flex w-1/4 items-center justify-end">
+        <Card className="@container/card mt-4 mx-4 lg:mt-4 flex lg:flex-row p-4">
+            <div className="lg:w-3/4">
+                <CardHeader>
+                  <CardDescription className="text-xl w-full lg:text-3xl font-extrabold">
+                    Outbound
+                  </CardDescription>
+                </CardHeader>
+                <CardFooter className="flex-col items-start gap-1.5 text-sm">
+                      Create your outbound order by adding customer information, selecting products, and setting quantities.
+                </CardFooter>
+            </div>
+        <div className="flex lg:w-1/4 items-center justify-end">
             <ResponsiveDialogDrawer
             open={open}
             onOpenChange={setOpen}
             trigger={
                 <Button
-                className="ml-4"
+                className="w-full lg:ml-4"
                 onClick={() => {
                     setMode("create")
                     setSelectedOutbound(null)
@@ -99,6 +111,7 @@ const Outbound = () => {
             </ResponsiveDialogDrawer>
 
         </div>
+        </Card>
         <div className="w-full flex-col justify-start gap-6"> 
             <DataTable 
               columns={columnsOutbound(handleCancel)} 

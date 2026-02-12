@@ -23,22 +23,23 @@ export const columnsInbound = (
     header: "Inbound Number",
   },
   {
-    accessorKey: "items.id_item",
+    accessorKey: "id_item",
     header: "Item Name",
     cell: ({ row }) => {
       const items = row.original.items || [];
-      const firstItem = items[0]?.id_item;
+      console.log("items",items)
+      const firstItem = items[0]?.item?.name;
       const extraItems = items.length - 1;
 
       return (
         <div className="flex items-center gap-1">
-            <Badge variant="secondary" className="text-xs">
+          <p>
             {firstItem || "No Items"}
-            </Badge>
+          </p>
           {extraItems > 0 && (
-            <Badge variant="secondary" className="text-xs">
+            <p>
               +{extraItems} more
-            </Badge>
+            </p>
           )}
         </div>
       );
@@ -59,7 +60,20 @@ export const columnsInbound = (
   },
   {
     accessorKey: "received_at",
-    header: "Received At",
+    header: "Received Date",
+    cell: ({ getValue }) => {
+    const value = getValue<string>()
+
+    if (!value) return "-"
+
+    return new Date(value).toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    // hour: "2-digit",
+    // minute: "2-digit",
+    })
+  },
   },
   {
     accessorKey: "status_inbound",
@@ -71,7 +85,20 @@ export const columnsInbound = (
   },
   {
     accessorKey: "last_update",
-    header: "Updated At",
+    header: "Last Update",
+    cell: ({ getValue }) => {
+    const value = getValue<string>()
+
+    if (!value) return "-"
+
+    return new Date(value).toLocaleDateString("id-ID", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    // hour: "2-digit",
+    // minute: "2-digit",
+    })
+  },
   },
   {
   id: "actions",

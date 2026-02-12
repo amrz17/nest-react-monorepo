@@ -55,6 +55,9 @@ export const saleOrderSchema = z.object({
       qty_ordered: z.number().min(1, "Quantity must be at least 1"),
       qty_shipped: z.number().optional(),
       price_per_unit: z.number().min(0, "Price must be at least 0"),
+      item: z.object({
+        name: z.string().optional()
+      }).optional(),
     }),
   )
 })
@@ -64,6 +67,9 @@ export type SaleOrderPayload = z.infer<typeof saleOrderSchema>
 // Item Schema
 export const itemSchema = z.object({
   id_item: z.string().optional(),
+  item: z.object({
+    name: z.string().optional()
+  }).optional(),
   sku: z.string().min(1, "SKU is required"),
   name: z.string().min(1, "Item name is required"),
   description: z.string().optional(),
@@ -78,7 +84,13 @@ export type ItemPayload = z.infer<typeof itemSchema>
 export const inventorySchema = z.object({
   id_inventory: z.string().optional(),
   id_item: z.string().min(1, "ID Item is requeired"),
+  item: z.object({
+    name: z.string().optional()
+  }),
   id_location: z.string().min(1, "ID location is required"),
+  location: z.object({
+    bin_code: z.string().optional()
+  }).optional(),
   qty_available: z.number().min(1, "Quantity is required"),
   qty_reserved: z.number(),
   last_update: z.string().optional(),
@@ -121,6 +133,9 @@ export const inboundSchema = z.object({
       id_item: z.string().min(1, "Item ID is required"),
       id_poi: z.string().min(1, "Purchase Order Item ID is required"),
       qty_received: z.number().min(1, "Quantity received must be at least 1"),
+      item: z.object({
+        name: z.string().optional()
+      }).optional(),
     }),
   ),
   last_update: z.string().optional(),
@@ -142,7 +157,7 @@ export const OutboundSchema = z.object({
   }).optional(),
   id_customer: z.string().min(1, "Customer ID is required"),
   customer: z.object({
-    name: z.string().optional()
+    customer_name: z.string().optional()
   }).optional(),
   shipped_at: z.string().min(1, "Shipped date is required"),
   carrier_name: z.string().min(1, "Carrier name is required"),
@@ -154,6 +169,9 @@ export const OutboundSchema = z.object({
       id_item: z.string().min(1, "Item ID is required"),
       id_soi: z.string().min(1, "Sales Order Item ID is required"),
       qty_shipped: z.number().min(1, "Quantity shipped must be at least 1"),
+      item: z.object({
+        name: z.string().optional()
+      }).optional(),
     }),
   ),
   updated_at: z.string().optional(),

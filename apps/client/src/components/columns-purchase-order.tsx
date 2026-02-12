@@ -72,9 +72,24 @@ export const columnsOrders = (
     header: "Total Price",
     cell: ({ row }) => {
       const items = row.original.items || [];
-      console.log("Items in row:", items);
-      // Mengambil semua qty_ordered dan menggabungkannya dengan koma
-      return <span>{items.map(i => i.total_price).join(", ")}</span>;
+      const formatIDR = (amount: number | string) => {
+      const value = typeof amount === "string" ? parseFloat(amount) : amount;
+      return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+      }).format(value || 0);
+    };
+
+    return (
+      <div className="flex flex-col gap-1">
+        {items.map((i, index) => (
+          <span key={index} className="text-sm font-mono">
+            {formatIDR(i.total_price || 0)}
+          </span>
+        ))}
+      </div>
+    );
     },
   },
   {
@@ -92,6 +107,19 @@ export const columnsOrders = (
   {
     accessorKey: "last_updated",
     header: "Updated At",
+      cell: ({ getValue }) => {
+      const value = getValue<string>()
+
+      if (!value) return "-"
+
+      return new Date(value).toLocaleDateString("id-ID", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      // hour: "2-digit",
+      // minute: "2-digit",
+      })
+  },
   },
   {
   id: "actions",

@@ -11,6 +11,7 @@ import { fetchItems } from "@/api/item.api"
 import { useItems } from "@/hooks/use-item"
 import { toast } from "sonner"
 import type { ItemPayload } from "@/schemas/schema"
+import { Card, CardDescription, CardFooter, CardHeader } from "../ui/card"
 
 export default function ItemsTabContent() {
   const [data, setData] = useState<any>([])
@@ -73,25 +74,41 @@ export default function ItemsTabContent() {
   useEffect(() => { loadDataItem() }, [])
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex justify-end">
-        <ResponsiveDialogDrawer
-          open={open}
-          onOpenChange={setOpen}
-          trigger={
-            <Button onClick={() => { setMode("create"); setSelectedItem(null); setOpen(true); }}>
-              <PlusCircle className="mr-2 h-4 w-4" /> Create New Item
-            </Button>
-          }
-          title={mode === "create" ? "Add Item" : "Edit Item"}
-        >
-          <ItemForm 
-            mode={mode} 
-            initialData={selectedItem} 
-            onSuccess={() => { loadDataItem(); setOpen(false); }} 
-          />
-        </ResponsiveDialogDrawer>
-      </div>
+    <div className="flex flex-col lg:gap-4">
+      <Card className="@container/card mx-4 lg:mt-4 flex lg:flex-row p-4">
+        <div className="lg:w-3/4">
+            <CardHeader>
+              <CardDescription className="text-xl w-full lg:text-3xl font-extrabold">
+                Items
+              </CardDescription>
+            </CardHeader>
+            <CardFooter className="flex-col items-start lg:gap-1.5 text-sm">
+                  Easily manage and track every items here.
+            </CardFooter>
+        </div>
+        <div className="flex lg:justify-end">
+          <ResponsiveDialogDrawer
+            open={open}
+            onOpenChange={setOpen}
+            trigger={
+              <Button 
+                onClick={() => { setMode("create"); setSelectedItem(null); setOpen(true); }}
+                className="w-full"
+                size="lg"
+              >
+                <PlusCircle className="lg:mr-2 h-4 w-4" /> Create New Item
+              </Button>
+            }
+            title={mode === "create" ? "Add Item" : "Edit Item"}
+          >
+            <ItemForm 
+              mode={mode} 
+              initialData={selectedItem} 
+              onSuccess={() => { loadDataItem(); setOpen(false); }} 
+            />
+          </ResponsiveDialogDrawer>
+        </div>
+      </Card>
 
       <DataTable columns={columns} data={data} />
 

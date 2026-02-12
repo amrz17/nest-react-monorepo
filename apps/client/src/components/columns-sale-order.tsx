@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import { DropdownMenu, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import { Ban, MoreHorizontal } from "lucide-react";
 import { DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
+import { Badge } from "./ui/badge";
 
 export const columnsSaleOrders = ( 
   onCancel: (id_so: string) => void
@@ -13,12 +14,56 @@ export const columnsSaleOrders = (
         header: "No. Sale Order",
     },
     {
+        accessorKey: "createdBy.full_name",
+        header: "Created By",
+    },
+    {
+        accessorKey: "customer.customer_name",
+        header: "Customer Name",
+    },
+    {
+        accessorKey: "id_item",
+        header: "Item Name",
+        cell: ({ row }) => {
+        const items = row.original.items || [];
+        console.log(items);
+        const firstItem = items[0]?.item?.name;
+        const extraItems = items.length - 1;
+
+        return (
+            <div className="flex items-center gap-1">
+                <Badge variant="secondary" className="text-xs">
+                    {firstItem || "No Items"}
+                </Badge>
+            {extraItems > 0 && (
+                <Badge>
+                    +{extraItems} more
+                </Badge>
+            )}
+            </div>
+        );
+        },
+    },
+    {
         accessorKey: "so_status",
         header: "Status",
     },
     {
         accessorKey: "date_shipped",
         header: "Date Shipped",
+        cell: ({ getValue }) => {
+        const value = getValue<string>()
+
+        if (!value) return "-"
+
+        return new Date(value).toLocaleDateString("id-ID", {
+        day: "2-digit",
+        month: "long",
+        year: "numeric",
+        // hour: "2-digit",
+        // minute: "2-digit",
+        })
+    },
     },
     {
         id: "actions",

@@ -5,6 +5,7 @@ import { ConfirmCancelDialog } from "@/components/dialog-cancel";
 import { ResponsiveDialogDrawer } from "@/components/drawer-form";
 import { SaleForm } from "@/components/sale-form";
 import { Button } from "@/components/ui/button";
+import { Card, CardDescription, CardFooter, CardHeader } from "@/components/ui/card";
 import DahsboardLayout from "@/layout/DashboardLayout"
 import type { SaleOrderPayload } from "@/schemas/schema";
 import { PlusCircle } from "lucide-react";
@@ -56,13 +57,24 @@ export default function SalesPage() {
   return (
     <DahsboardLayout>
         <section className="flex flex-1 flex-col">
-        <div className="flex w-1/4 items-center justify-end">
+        <Card className="@container/card mt-4 mx-4 lg:mt-4 flex lg:flex-row p-4">
+            <div className="lg:w-3/4">
+                <CardHeader>
+                  <CardDescription className="text-xl w-full lg:text-3xl font-extrabold">
+                    Sale Order
+                  </CardDescription>
+                </CardHeader>
+                <CardFooter className="flex-col items-start gap-1.5 text-sm">
+                      Create your sale order by adding customer information, selecting products, and setting quantities.
+                </CardFooter>
+            </div>
+        <div className="flex lg:w-1/4 items-center lg:justify-end">
               <ResponsiveDialogDrawer
                 open={open}
                 onOpenChange={setOpen}
                 trigger={
                   <Button 
-                    className="flex flex-1 ml-4 mt-4"
+                    className="w-full lg:ml-4"
                     onClick={() => {
                       setMode("create")
                       setSelectedSale(null)
@@ -97,6 +109,7 @@ export default function SalesPage() {
               </ResponsiveDialogDrawer>
 
         </div>
+        </Card>
         <div className="w-full flex-col justify-start gap-6"> 
             <DataTable 
               columns={columnsSaleOrders(handleCancelOrder)} 
