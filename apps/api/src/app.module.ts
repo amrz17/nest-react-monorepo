@@ -15,6 +15,7 @@ import { CustomersModule } from './customers/customers.module';
 import { SuppliersModule } from './suppliers/suppliers.module';
 import { SalesModule } from './sales/sales.module';
 import { ItemsModule } from './items/items.module';
+import { ActivityLogsModule } from './activity-logs/activity-logs.module';
 
 @Module({
   imports: [
@@ -50,7 +51,8 @@ import { ItemsModule } from './items/items.module';
     LocationsModule,
     CustomersModule,
     SuppliersModule,
-    SalesModule
+    SalesModule,
+    ActivityLogsModule
   ],
   controllers: [AppController],
   providers: [AppService],

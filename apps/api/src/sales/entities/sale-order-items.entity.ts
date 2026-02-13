@@ -17,7 +17,7 @@ export class SaleOrderItemsEntity {
 
     @Column()
     id_item: string;
-    @ManyToOne(() => ItemsEntity)
+    @ManyToOne(() => ItemsEntity, (item) => item.saleItem)
     @JoinColumn({ name: 'id_item' })
     item: ItemsEntity;
 

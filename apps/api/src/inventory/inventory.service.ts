@@ -16,7 +16,9 @@ export class InventoryService {
 
     // get all
     async getAllInventory(): Promise<InventoryEntity[]> {
-        return this.inventoryRepository.find({})
+        return this.inventoryRepository.find({
+            relations: ['item', 'location']
+        })
     }
 
     // create Inventory

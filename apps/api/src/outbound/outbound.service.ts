@@ -201,7 +201,7 @@ export class OutboundService {
     //
     async getAllOutbound(): Promise<OutboundEntity[]> {
         return await this.outboundRepo.find({
-            relations: ['items', 'customer', 'shipped_by', 'sales_order']
+            relations: ['items.item', 'customer', 'shipped_by', 'sales_order']
         });
     }
 

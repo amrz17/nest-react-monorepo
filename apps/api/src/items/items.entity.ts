@@ -32,13 +32,13 @@ export class ItemsEntity {
     @OneToMany(() => PurchaseOrderItemsEntity, (poi) => poi.item) 
     poItem: PurchaseOrderItemsEntity[];
 
-    @OneToMany(() => InboundItemEntity, (inboundItem) => inboundItem.items) 
+    @OneToMany(() => InboundItemEntity, (inboundItem) => inboundItem.item) 
     inbound: InboundItemEntity[];
 
     @OneToMany(() => SaleOrderItemsEntity, (soi) => soi.item) 
     saleItem: SaleOrderItemsEntity[];
 
-    @OneToMany(() => OutboundItemEntity, (outboundItem) => outboundItem.Items) 
+    @OneToMany(() => OutboundItemEntity, (outboundItem) => outboundItem.item) 
     outbound: OutboundItemEntity[];
 
     @CreateDateColumn()

@@ -24,7 +24,7 @@ export class OutboundItemEntity {
     id_item: string;
     @ManyToOne(() => ItemsEntity , (item) => item.outbound )
     @JoinColumn({ name: 'id_item' })
-    Items: ItemsEntity;
+    item: ItemsEntity;
 
     @Column({ type: 'int' })
     qty_shipped: number;

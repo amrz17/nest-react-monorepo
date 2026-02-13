@@ -66,7 +66,7 @@ export class OutboundEntity {
     @CreateDateColumn()
     created_at: Date;
 
-    @OneToMany(() => OutboundItemEntity, (outboundItem) => outboundItem.outbound)
+    @OneToMany(() => OutboundItemEntity, (outboundItem) => outboundItem.outbound, { cascade: true })
     @JoinColumn({ name: 'id_outbound_item' })
     items: OutboundItemEntity[];
 

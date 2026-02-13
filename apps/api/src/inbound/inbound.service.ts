@@ -127,7 +127,7 @@ export class InboundService {
 
     async getAllInbound(): Promise<InboundEntity[]> {
         return await this.inboundRepo.find({
-            relations: ['receivedBy', 'supplierName', 'items'],
+            relations: ['receivedBy', 'supplierName', 'items.item'],
             order: {
                 created_at: 'DESC'
             }

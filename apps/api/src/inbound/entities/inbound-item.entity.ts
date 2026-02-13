@@ -19,7 +19,7 @@ export class InboundItemEntity {
     id_item: string;
     @ManyToOne(() => ItemsEntity, (item) => item.inbound)
     @JoinColumn({ name: 'id_item' })
-    items: ItemsEntity;
+    item: ItemsEntity;
 
     @Column()
     id_poi: string;
