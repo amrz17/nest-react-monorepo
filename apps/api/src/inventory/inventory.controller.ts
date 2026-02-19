@@ -5,7 +5,6 @@ import { IInventoryResponse } from './types/inventoryResponse.interface';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
 import { AuthGuard } from '../user/guards/auth.guard';
 import { type AuthRequest } from '../user/types/expressRequest.interface';
-// import { JwtAuthGuard } from 'src/user/guards/jwt-auth.guard';
 
 @Controller('inventory')
 export class InventoryController {

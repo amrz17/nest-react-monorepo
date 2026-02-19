@@ -1,7 +1,9 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Req, UseGuards } from '@nestjs/common';
 import { SalesService } from './sales.service';
 import { CreateSaleDTO } from './dto/create-sale.dto';
 import { ISaleResponse } from './types/salesResponse.interface';
+import { AuthGuard } from '../user/guards/auth.guard';
+import { type AuthRequest } from '../user/types/expressRequest.interface';
 
 @Controller('sale-order')
 export class SalesController {
@@ -16,10 +18,13 @@ export class SalesController {
 
     // 
     @Post()
+    @UseGuards(AuthGuard)
     async createSale(
-        @Body() createSaleOrderDto: CreateSaleDTO 
+        @Body() createSaleOrderDto: CreateSaleDTO,
+        @Req() req: AuthRequest
     ): Promise<ISaleResponse> {
-        const newSale = await this.saleOrderService.createSaleOrder(createSaleOrderDto);
+        const userId = req.user.id_user;
+        const newSale = await this.saleOrderService.createSaleOrder(createSaleOrderDto, userId);
 
         return await this.saleOrderService.generateSaleOrderResponse(newSale);
     }

@@ -52,7 +52,9 @@ export class InventoryService {
                 description: `Add new stock for id item: ${(await savedInventory).id_item}`,
                 metadata: {
                     initial_qty: (await savedInventory).qty_available,
-                    location: (await savedInventory).location
+                    initial_reserved: (await savedInventory).qty_reserved,
+                    initial_ordered: (await savedInventory).qty_ordered,
+                    id_location: (await savedInventory).id_location
                 }
             })
 
@@ -73,15 +75,6 @@ export class InventoryService {
         updateInventroyDto: UpdateInventoryDto,
         userId: string
     ): Promise<InventoryEntity> {
-
-        // const inventory = await this.inventoryRepository.findOne({ where: { id_inventory }})
-        // if (!inventory) {
-        //     throw new NotFoundException('Inventory Not Found!')
-        // }
-
-        // Object.assign(inventory, updateInventroyDto);
-
-        // return this.inventoryRepository.save(inventory);
 
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
@@ -113,12 +106,16 @@ export class InventoryService {
                 description: `Update inventory item ${oldInventory.id_item}`,
                 metadata: {
                     before: {
+                        id_location: oldDataSnapshot.id_location,
                         qty_available: oldDataSnapshot.qty_available,
-                        location: oldDataSnapshot.location
+                        qty_reserved: oldDataSnapshot.qty_reserved,
+                        qty_ordered: oldDataSnapshot.qty_ordered,
                     },
                     after: {
+                        id_location: updateInventory.id_location,
                         qty_available: updateInventory.qty_available,
-                        location: updateInventory.location
+                        qty_reserved: updateInventory.qty_reserved,
+                        qty_ordered: updateInventory.qty_ordered,
                     }
                 }
             });
@@ -133,13 +130,6 @@ export class InventoryService {
             await queryRunner.release();
         }
     }
-
-    // // delete inventory
-    // async deleteInventory(
-    //     id_inventory: string,
-    // ): Promise<void> {
-    //     await this.inventoryRepository.delete({ id_inventory });
-    // }
 
     async deleteInventory(
         id_inventory: string,

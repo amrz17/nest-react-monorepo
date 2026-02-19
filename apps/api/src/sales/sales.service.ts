@@ -5,7 +5,7 @@ import { SalesOrderEntity, SalesOrderStatus } from './entities/sales-order.entit
 import { CreateSaleDTO } from './dto/create-sale.dto';
 import { SaleOrderItemsEntity } from './entities/sale-order-items.entity';
 import { ISaleResponse } from './types/salesResponse.interface';
-import { InventoryEntity } from 'src/inventory/inventory.entity';
+import { InventoryEntity } from '../inventory/inventory.entity';
 
 @Injectable()
 export class SalesService {
@@ -27,7 +27,8 @@ export class SalesService {
 
     // Create Sale Order
     async createSaleOrder(
-        createSaleDTO: CreateSaleDTO
+        createSaleDTO: CreateSaleDTO,
+        userId: string
     ): Promise<any> {
 
         const queryRunner = this.dataSource.createQueryRunner();
@@ -46,7 +47,7 @@ export class SalesService {
                 so_status: createSaleDTO.so_status,
                 date_shipped: createSaleDTO.date_shipped,
                 customer: { id_customer: createSaleDTO.id_customer},
-                createdBy: { id_user: createSaleDTO.id_user },
+                createdBy: { id_user: userId },
                 note: createSaleDTO.note
             } as any);
 

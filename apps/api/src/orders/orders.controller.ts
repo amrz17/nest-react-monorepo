@@ -1,7 +1,9 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, Req, UseGuards } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { IOrdersResponse } from './types/ordersResponse.interface';
+import { AuthGuard } from 'src/user/guards/auth.guard';
+import { type AuthRequest } from '../user/types/expressRequest.interface';
 
 @Controller('purchase-order')
 export class OrdersController {
@@ -9,8 +11,13 @@ export class OrdersController {
 
     // Create Order
     @Post('')
-    async createOrder(@Body() createOrderDto: CreateOrderDto): Promise<IOrdersResponse> {
-        const saveOrder = await this.ordersService.createOrder(createOrderDto);
+    @UseGuards(AuthGuard)
+    async createOrder(
+        @Body() createOrderDto: CreateOrderDto,
+        @Req() req: AuthRequest
+    ): Promise<IOrdersResponse> {
+        const userId = req.user.id_user;
+        const saveOrder = await this.ordersService.createOrder(createOrderDto, userId);
 
         return this.ordersService.generatedOrderResponse(saveOrder);
     }

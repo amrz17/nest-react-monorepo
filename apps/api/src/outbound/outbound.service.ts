@@ -6,7 +6,7 @@ import { CreateOutbounddDto } from './dto/create-outbound.dto';
 import { OutboundItemEntity } from './entities/outbound-item.entity';
 import { SaleOrderItemsEntity } from 'src/sales/entities/sale-order-items.entity';
 import { SalesOrderEntity, SalesOrderStatus } from 'src/sales/entities/sales-order.entity';
-import { InventoryEntity } from 'src/inventory/inventory.entity';
+import { InventoryEntity } from '../inventory/inventory.entity';
 import { IOutboundResponse } from './types/outboundResponse.Interface';
 
 @Injectable()
@@ -18,7 +18,8 @@ export class OutboundService {
     ) {}
 
     async createOutbound(
-        createOutboundDto: CreateOutbounddDto
+        createOutboundDto: CreateOutbounddDto,
+        userId: string
     ): Promise<any> {
         const queryRunner = await this.dataSource.createQueryRunner();
         await queryRunner.connect();
@@ -29,7 +30,7 @@ export class OutboundService {
             const outboundHeader = await queryRunner.manager.create(OutboundEntity, {
                 outbound_number: createOutboundDto.outbound_number,
                 sales_order: { id_so: createOutboundDto.id_so },
-                shipped_by: { id_user: createOutboundDto.id_user },
+                shipped_by: { id_user: userId },
                 customer: { id_customer: createOutboundDto.id_customer },
                 shipped_at: createOutboundDto.shipped_at,
                 carrier_name: createOutboundDto.carrier_name,

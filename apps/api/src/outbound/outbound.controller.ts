@@ -1,6 +1,8 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Req, UseGuards } from '@nestjs/common';
 import { OutboundService } from './outbound.service';
 import { CreateOutbounddDto } from './dto/create-outbound.dto';
+import { AuthGuard } from '../user/guards/auth.guard';
+import { type AuthRequest } from '../user/types/expressRequest.interface';
 
 @Controller('outbound')
 export class OutboundController {
@@ -10,10 +12,13 @@ export class OutboundController {
 
     // 
     @Post()
+    @UseGuards(AuthGuard)
     async createOutbound(
-        @Body() createOuboundDto: CreateOutbounddDto
+        @Body() createOuboundDto: CreateOutbounddDto,
+        @Req() req: AuthRequest
     ): Promise<any> {
-        const newOutbound = await this.outboundService.createOutbound(createOuboundDto);
+        const userId = req.user.id_user;
+        const newOutbound = await this.outboundService.createOutbound(createOuboundDto, userId);
 
         return await this.outboundService.generatedResponse(newOutbound);
     }

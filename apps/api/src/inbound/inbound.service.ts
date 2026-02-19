@@ -22,7 +22,8 @@ export class InboundService {
 
     // create 
     async createInbound(
-        createInboundDto: CreateInboundDto
+        createInboundDto: CreateInboundDto,
+        userId: string
     ): Promise<InboundEntity> {
         const queryRunner = this.dataSource.createQueryRunner();
         // Connect TO DB
@@ -34,7 +35,7 @@ export class InboundService {
             const inboundHeader = queryRunner.manager.create(InboundEntity, {
                 inbound_number: createInboundDto.inbound_number,
                 purchaseOrder: { id_po: createInboundDto.id_po },
-                receivedBy: { id_user: createInboundDto.id_user },
+                receivedBy: { id_user: userId },
                 supplierName: { id_supplier: createInboundDto.id_supplier },
                 received_at: createInboundDto.received_at,
                 note: createInboundDto.note,

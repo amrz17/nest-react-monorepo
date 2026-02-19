@@ -5,7 +5,7 @@ import { OrderEntity, PurchaseOrderStatus } from './entities/orders.entity';
 import { DataSource, Repository } from 'typeorm';
 import { IOrdersResponse } from './types/ordersResponse.interface';
 import { PurchaseOrderItemsEntity } from './entities/order-items.entity';
-import { InventoryEntity } from 'src/inventory/inventory.entity';
+import { InventoryEntity } from '../inventory/inventory.entity';
 
 @Injectable()
 export class OrdersService {
@@ -16,7 +16,10 @@ export class OrdersService {
 ) {}
 
   // Create Order   
-   async createOrder(createOrderDto: CreateOrderDto): Promise<OrderEntity> {
+   async createOrder(
+      createOrderDto: CreateOrderDto,
+      userId: string
+   ): Promise<OrderEntity> {
 
       const queryRunner = this.dataSource.createQueryRunner();
       await queryRunner.connect();
@@ -30,7 +33,7 @@ export class OrdersService {
          // Simpan header po
          const poHeader = queryRunner.manager.create(OrderEntity, {
             po_number : poNumber,
-            createdBy: { id_user: createOrderDto.id_user },
+            createdBy: userId,
             supplier: { id_supplier: createOrderDto.id_supplier},
             status: PurchaseOrderStatus.PENDING,
             expected_delivery_date: createOrderDto.expected_delivery_date,
