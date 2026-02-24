@@ -6,12 +6,14 @@ import { DataSource, Repository } from 'typeorm';
 import { IOrdersResponse } from './types/ordersResponse.interface';
 import { PurchaseOrderItemsEntity } from './entities/order-items.entity';
 import { InventoryEntity } from '../inventory/inventory.entity';
+import { ActivityLogsService } from '../activity-logs/activity-logs.service';
 
 @Injectable()
 export class OrdersService {
   constructor(
    @InjectRepository(OrderEntity) 
    private readonly orderRepository: Repository<OrderEntity>,
+   private readonly activityLogsService: ActivityLogsService,
    private readonly dataSource: DataSource
 ) {}
 
@@ -67,6 +69,22 @@ export class OrdersService {
             );
          }
 
+         // simpan logs
+         await this.activityLogsService.createLogs(queryRunner.manager, {
+               id_user: userId,
+               action: 'CREATE',
+               module: "PURCHASE ORDER",
+               resource_id: (await savePO).id_po,
+               description: `${(await savePO).po_number}`,
+               metadata: {
+                  createdBy: (await savePO).createdBy,
+                  supplier: (await savePO).supplier,
+                  expected_delivery_date: (await savePO).expected_delivery_date,
+                  po_status: (await savePO).po_status,
+                  note: (await savePO).note,
+               }
+         })
+
          // commit 
          await queryRunner.commitTransaction()
          return savePO;
@@ -98,16 +116,16 @@ export class OrdersService {
         await queryRunner.startTransaction();
 
         try {
-            const so = await queryRunner.manager.findOne(OrderEntity, {
+            const po = await queryRunner.manager.findOne(OrderEntity, {
                 where: { id_po: id_po },
                 relations: ['items']
             });
 
-            if (!so) throw new NotFoundException('Purchase Order Not Found!');
-            if (so.po_status === PurchaseOrderStatus.CANCELED) throw new BadRequestException('Already canceled!');
+            if (!po) throw new NotFoundException('Purchase Order Not Found!');
+            if (po.po_status === PurchaseOrderStatus.CANCELED) throw new BadRequestException('Already canceled!');
 
             // loop items untuk mengembalikan stock
-            for (const item of so.items) {
+            for (const item of po.items) {
 
                 // Kurangi stock ordered in Inventory
                 await queryRunner.manager.decrement(InventoryEntity, 
@@ -118,8 +136,24 @@ export class OrdersService {
             }
 
             // Ubah status SO
-            so.po_status = PurchaseOrderStatus.CANCELED;
-            await queryRunner.manager.save(so);
+            po.po_status = PurchaseOrderStatus.CANCELED;
+            await queryRunner.manager.save(po);
+
+            // simpan logs
+            await this.activityLogsService.createLogs(queryRunner.manager, {
+                  id_user: '',
+                  action: 'CANCEL',
+                  module: "PURCHASE ORDER",
+                  resource_id: id_po,
+                  description: po.po_number,
+                  metadata: {
+                     createdBy: po.createdBy,
+                     supplier: po.supplier,
+                     expected_delivery_date: po.expected_delivery_date,
+                     po_status: po.po_status,
+                     note: po.note,
+                  }
+            })
 
             //
             await queryRunner.commitTransaction();

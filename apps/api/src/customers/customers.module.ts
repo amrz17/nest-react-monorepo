@@ -5,13 +5,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { CustomerEntity } from './customer.entity';
 import { SalesOrderEntity } from '../sales/entities/sales-order.entity';
 import { OutboundEntity } from '../outbound/entities/outbound.entity';
+import { ActivityLogsModule } from '../activity-logs/activity-logs.module';
 
 @Module({
   imports: [TypeOrmModule.forFeature([
     CustomerEntity,
     SalesOrderEntity,
     OutboundEntity
-  ])],
+  ]),
+    ActivityLogsModule
+  ],
   controllers: [CustomersController],
   providers: [CustomersService],
 

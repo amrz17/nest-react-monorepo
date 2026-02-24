@@ -13,7 +13,6 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 
-// TODO : Fix responsive issue
 export default function SalesPage() {
   const [data, setData] = useState<SaleOrderPayload[]>([]);
   const [openCancel, setOpenCancel] = useState(false)

@@ -9,6 +9,7 @@ import { ItemsEntity } from '../items/items.entity';
 import { UserEntity } from '../user/user.entity';
 import { SupplierEntity } from '../suppliers/suppliers.entity';
 import { OrderEntity } from '../orders/entities/orders.entity';
+import { ActivityLogsModule } from '../activity-logs/activity-logs.module';
 
 @Module({
     imports: [TypeOrmModule.forFeature([
@@ -19,7 +20,9 @@ import { OrderEntity } from '../orders/entities/orders.entity';
         ItemsEntity,
         UserEntity,
         SupplierEntity
-    ])],
+    ]),
+        ActivityLogsModule
+    ],
     controllers: [InboundController],
     providers: [InboundService],
 })

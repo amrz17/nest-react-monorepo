@@ -13,7 +13,6 @@ import { PlusCircle } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
-// TODO : Make better UI/UX for outbound page
 const Outbound = () => {
   const [data, setData] = useState<OutboundPayload[]>([])
   const [open, setOpen] = useState(false)

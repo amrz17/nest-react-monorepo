@@ -1,15 +1,14 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { InboundEntity, StatusInbound } from './entities/inbound.entity';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { CreateInboundDto } from './dto/create-inbound.dto';
-import { UpdateInboundDto } from './dto/update-inbound.dto';
 import { InboundItemEntity } from './entities/inbound-item.entity';
 import { IInboundResponse } from './types/inboundResponse.interface';
 import { InventoryEntity } from '../inventory/inventory.entity';
 import { PurchaseOrderItemsEntity } from '../orders/entities/order-items.entity';
 import { OrderEntity, PurchaseOrderStatus } from '../orders/entities/orders.entity';
-import { QueryRunner } from 'typeorm/browser';
+import { ActivityLogsService } from '../activity-logs/activity-logs.service';
 
 @Injectable()
 export class InboundService {
@@ -17,6 +16,7 @@ export class InboundService {
     constructor(
         @InjectRepository(InboundEntity)
         private readonly inboundRepo: Repository<InboundEntity>,
+        private readonly activityLogsService: ActivityLogsService,
         private readonly dataSource: DataSource
     ) {}
 
@@ -110,6 +110,23 @@ export class InboundService {
                 );
             }
 
+            // simpan logs
+            await this.activityLogsService.createLogs(queryRunner.manager, {
+                id_user: userId,
+                action: 'CREATE',
+                module: "INBOUND",
+                resource_id: (await saveInbound).id_inbound,
+                description: `Reacived By: ${(await saveInbound).receivedBy}`,
+                metadata: {
+                    inbound_number: (await saveInbound).inbound_number,
+                    id_po: (await saveInbound).id_po,
+                    id_user: (await saveInbound).id_user,
+                    received_at: (await saveInbound).received_at,
+                    id_supplier: (await saveInbound).id_supplier,
+                    note: (await saveInbound).note,
+                    status_inbound: (await saveInbound).status_inbound,
+                }
+            })
 
             // commit
             await queryRunner.commitTransaction();
@@ -171,12 +188,31 @@ export class InboundService {
                 );
             }
 
+
             // Ubah status Inbound Header
             inbound.status_inbound = StatusInbound.CANCELED;
             await queryRunner.manager.save(inbound);
 
             // Update kembali status PO Header ke 'PARTIAL' atau 'OPEN'
             await this.updatePOStatus(inbound.id_po, queryRunner);
+
+            // simpan logs
+            await this.activityLogsService.createLogs(queryRunner.manager, {
+                id_user: '',
+                action: 'CANCEL',
+                module: "INBOUND",
+                resource_id: (await inbound).id_inbound,
+                description: `${(await inbound).inbound_number}`,
+                metadata: {
+                    inbound_number: (await inbound).inbound_number,
+                    id_po: (await inbound).id_po,
+                    id_user: (await inbound).id_user,
+                    received_at: (await inbound).received_at,
+                    id_supplier: (await inbound).id_supplier,
+                    note: (await inbound).note,
+                    status_inbound: (await inbound).status_inbound,
+                }
+            })
 
             await queryRunner.commitTransaction();
         } catch (err) {

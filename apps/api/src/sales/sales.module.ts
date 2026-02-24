@@ -6,6 +6,7 @@ import { SalesService } from './sales.service';
 import { SalesController } from './sales.controller';
 import { UserEntity } from '../user/user.entity';
 import { CustomerEntity } from '../customers/customer.entity';
+import { ActivityLogsModule } from '../activity-logs/activity-logs.module';
 
 @Module({
     imports: [TypeOrmModule.forFeature([
@@ -13,7 +14,9 @@ import { CustomerEntity } from '../customers/customer.entity';
         SaleOrderItemsEntity,
         UserEntity,
         CustomerEntity
-    ])],
+    ]),
+        ActivityLogsModule
+    ],
     providers: [SalesService],
     controllers: [SalesController]
 })

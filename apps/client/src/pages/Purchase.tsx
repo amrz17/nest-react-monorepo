@@ -16,7 +16,6 @@ import type { OrderPayload } from "@/schemas/schema"
 import { ConfirmCancelDialog } from "@/components/dialog-cancel"
 
 
-// TODO : Fix responsive issue
 const PurchasePage = () => {
 
   const [data, setData] = useState<OrderPayload[]>([])

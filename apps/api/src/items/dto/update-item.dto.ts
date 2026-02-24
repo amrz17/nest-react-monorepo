@@ -12,7 +12,4 @@ export class UpdateItemDto {
 
     @IsNumber()
     readonly price: number;
-
-    @IsBoolean()
-    readonly isActive?: boolean;
 }

@@ -6,12 +6,15 @@ import { CreateSaleDTO } from './dto/create-sale.dto';
 import { SaleOrderItemsEntity } from './entities/sale-order-items.entity';
 import { ISaleResponse } from './types/salesResponse.interface';
 import { InventoryEntity } from '../inventory/inventory.entity';
+import { ActivityLogsService } from '../activity-logs/activity-logs.service';
+import { UpdateCustomerDto } from 'src/customers/dto/update-customer.dto';
 
 @Injectable()
 export class SalesService {
     constructor(
         @InjectRepository(SalesOrderEntity)
         private readonly saleRepo: Repository<SalesOrderEntity>,
+        private readonly activityLogsService: ActivityLogsService,
         private readonly dataSource: DataSource
     ) {}
 
@@ -94,6 +97,22 @@ export class SalesService {
                 );
             }
 
+            // simpan logs
+            await this.activityLogsService.createLogs(queryRunner.manager, {
+                id_user: userId,
+                action: 'CREATE',
+                module: "SALE ORDER",
+                resource_id: (await saveSO).id_so,
+                description: `${(await saveSO).so_number}`,
+                metadata: {
+                    createdBy: (await saveSO).createdBy,
+                    customer: (await saveSO).customer.full_name,
+                    date_shipped: (await saveSO).date_shipped,
+                    so_status: (await saveSO).so_status,
+                    note: (await saveSO).note,
+                }
+            })
+
             // commit 
             await queryRunner.commitTransaction();
             return saveSO;
@@ -136,6 +155,22 @@ export class SalesService {
             // Ubah status SO
             so.so_status = SalesOrderStatus.CANCELED;
             await queryRunner.manager.save(so);
+
+            // simpan logs
+            await this.activityLogsService.createLogs(queryRunner.manager, {
+                id_user: '',
+                action: 'CANCEL',
+                module: "SALE ORDER",
+                resource_id: so.id_so,
+                description: so.so_number,
+                metadata: {
+                    createdBy: so.createdBy,
+                    customer: so.customer.full_name,
+                    date_shipped: so.date_shipped,
+                    so_status: so.so_status,
+                    note: so.note,
+                }
+            })
 
             //
             await queryRunner.commitTransaction();

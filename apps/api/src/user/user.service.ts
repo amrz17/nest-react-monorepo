@@ -87,7 +87,7 @@ export class UserService {
             action: 'LOGIN',
             module: 'USER',
             resource_id: user.id_user,
-            description: `Login by ${user.id_user}`,
+            description: `Login by ${user.full_name}`,
             metadata: {
                 before: {
                 },
@@ -141,7 +141,7 @@ export class UserService {
         },
         process.env.JWT_SECRET as string,
         {
-            expiresIn: '8h',   // ⬅️ TOKEN AKAN EXPIRED DALAM 1 HARI
+            expiresIn: '8h',   // TOKEN AKAN EXPIRED DALAM 1 HARI
         },
     );
   }
@@ -157,7 +157,7 @@ export class UserService {
             action: 'LOGOUT',
             module: 'USER',
             resource_id: userId,
-            description: `User ${userId} has logged out from the system, `
+            description: `User has logged out`
         });
 
         await queryRunner.commitTransaction();

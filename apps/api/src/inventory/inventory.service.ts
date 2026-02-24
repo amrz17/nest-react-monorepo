@@ -49,12 +49,11 @@ export class InventoryService {
                 action: 'CREATE',
                 module: "INVENTORY",
                 resource_id: (await savedInventory).id_inventory,
-                description: `Add new stock for id item: ${(await savedInventory).id_item}`,
+                description: `For item: ${(await savedInventory).item.name}, at: ${(await savedInventory).location.bin_code}.`,
                 metadata: {
                     initial_qty: (await savedInventory).qty_available,
                     initial_reserved: (await savedInventory).qty_reserved,
                     initial_ordered: (await savedInventory).qty_ordered,
-                    id_location: (await savedInventory).id_location
                 }
             })
 
@@ -83,14 +82,18 @@ export class InventoryService {
         try {
             // data lama
             const oldInventory = await queryRunner.manager.findOne(InventoryEntity, {
-                where: { id_inventory }
+                where: { id_inventory },
+                relations: ['item', 'location']
             });
 
             if (!oldInventory) {
                 throw new NotFoundException('Inventory Not Found!')
             }
 
-            const oldDataSnapshot = { ...oldInventory };
+            // Snapshot data lama secara eksplisit
+            const before = {
+                ...oldInventory
+            };
 
             // update data
             Object.assign(oldInventory, updateInventroyDto);
@@ -103,15 +106,11 @@ export class InventoryService {
                 action: 'UPDATE',
                 module: 'INVENTORY',
                 resource_id: id_inventory,
-                description: `Update inventory item ${oldInventory.id_item}`,
+                description: `Update inventory item: ${oldInventory.item.name}`,
                 metadata: {
-                    before: {
-                        id_location: oldDataSnapshot.id_location,
-                        qty_available: oldDataSnapshot.qty_available,
-                        qty_reserved: oldDataSnapshot.qty_reserved,
-                        qty_ordered: oldDataSnapshot.qty_ordered,
-                    },
+                    before: before,
                     after: {
+                        id_item: updateInventory.id_item,
                         id_location: updateInventory.id_location,
                         qty_available: updateInventory.qty_available,
                         qty_reserved: updateInventory.qty_reserved,
@@ -158,7 +157,7 @@ export class InventoryService {
                 action: 'DELETE',
                 module: 'INVENTORY',
                 resource_id: id_inventory,
-                description: `Menghapus data inventory untuk item SKU: ${inventory.id_item}`,
+                description: `Inventory with item: ${inventory.item.name}`,
                 metadata: { 
                     deleted_data: inventory, // Menyimpan seluruh object yang dihapus
                     deleted_at: new Date()

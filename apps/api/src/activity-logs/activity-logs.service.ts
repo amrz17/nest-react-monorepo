@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ActivityLogsEntity } from './entities/activity-logs.entity';
 import { DataSource, EntityManager, Repository } from 'typeorm';
+import { IActivityLogsResponse } from './types/activity-logsResponse.interface';
 
 export interface ICreateLog {
     id_user: string;
@@ -36,5 +37,24 @@ export class ActivityLogsService {
         });
         return await manager.save(log);
     }    
+
+    async getActivityLogs (): Promise<any> {
+        return this.activityLogsRepo.find({
+            relations: [
+                'createdBy'
+            ]
+        })
+    }
+
+
+    // 
+    generateActivityLogsResponse(
+        logs: ActivityLogsEntity | ActivityLogsEntity[]
+    ): IActivityLogsResponse {
+        return {
+            success: true,
+            logs: logs
+        }
+    }
 
 }

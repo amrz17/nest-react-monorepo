@@ -13,7 +13,6 @@ import { InboundForm } from "@/components/inbound-form"
 import { useInbound } from "@/hooks/use-inbound"
 import { Card, CardDescription, CardFooter, CardHeader } from "@/components/ui/card"
 
-// TODO : Make interface better
 const Inbound = () => {
 
   const [data, setData] = useState<InboundPayload[]>([])

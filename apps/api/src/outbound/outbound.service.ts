@@ -8,12 +8,14 @@ import { SaleOrderItemsEntity } from 'src/sales/entities/sale-order-items.entity
 import { SalesOrderEntity, SalesOrderStatus } from 'src/sales/entities/sales-order.entity';
 import { InventoryEntity } from '../inventory/inventory.entity';
 import { IOutboundResponse } from './types/outboundResponse.Interface';
+import { ActivityLogsService } from '../activity-logs/activity-logs.service';
 
 @Injectable()
 export class OutboundService {
     constructor(
         @InjectRepository(OutboundEntity)
         private readonly outboundRepo: Repository<OutboundEntity>,
+        private readonly activityLogsService: ActivityLogsService,
         private readonly dataSource: DataSource
     ) {}
 
@@ -106,6 +108,18 @@ export class OutboundService {
                 }
             }
 
+            // simpan logs
+            await this.activityLogsService.createLogs(queryRunner.manager, {
+                id_user: userId,
+                action: 'CREATE',
+                module: 'OUTBOUND',
+                resource_id: (await saveOutbound).id_outbound,
+                description: `${(await saveOutbound).outbound_number}`,
+                metadata: {
+                    ...saveOutbound
+                }
+            })
+
             // 
             await queryRunner.commitTransaction();
             return saveOutbound;
@@ -159,6 +173,18 @@ export class OutboundService {
 
             // Update kembali status PO Header ke 'PARTIAL' atau 'OPEN'
             await this.updateSoStatus(outbound.id_so, queryRunner);
+
+            // simpan logs
+            await this.activityLogsService.createLogs(queryRunner.manager, {
+                id_user: '',
+                action: 'CANCEL',
+                module: 'OUTBOUND',
+                resource_id: outbound.id_outbound,
+                description: outbound.outbound_number,
+                metadata: {
+                    ...outbound
+                }
+            })
 
             await queryRunner.commitTransaction();
         } catch (err) {
