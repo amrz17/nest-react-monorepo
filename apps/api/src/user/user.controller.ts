@@ -1,5 +1,4 @@
 import { Body, Controller, Get, HttpStatus, Post, Put, Req, Res, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common";
-import { type Response } from 'express';
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/createUser.dto";
 import { IUserResponse } from "./types/userResponse.interface";
@@ -8,6 +7,10 @@ import { User } from "./decorators/user.decorator";
 import { AuthGuard } from "./guards/auth.guard";
 import { UpdateUserDto } from "./dto/updateUser.dto";
 import { type AuthRequest } from "./types/expressRequest.interface";
+import { Roles } from "./decorators/roles.decorator";
+import { RolesGuard } from "./guards/roles.guard";
+
+// TODO : FINISH RBAC (Role-Based Access Control) Feature
 
 @Controller()
 export class UserContainerOptions {
@@ -19,16 +22,19 @@ export class UserContainerOptions {
         return await this.userService.createUser(createUserDto);
     }
 
+    @Roles('MANAGER', 'STAFF_GUDANG', 'PICKER')
     @Post('user/login')
     @UsePipes(new ValidationPipe())
+    @UseGuards(AuthGuard, RolesGuard) 
     async loginUser(@Body('user') loginUserDto: LoginDto): Promise<IUserResponse> {
         const user = await this.userService.loginUser(loginUserDto);
         console.log(user);
         return this.userService.generatedUserResponse(user);
     }
 
+    @Roles('MANAGER', 'STAFF_GUDANG', 'PICKER')
     @Post('user/logout')
-    @UseGuards(AuthGuard) 
+    @UseGuards(AuthGuard, RolesGuard) 
     async logout(@Req() req: AuthRequest) {
         const userId = req.user.id_user; 
         

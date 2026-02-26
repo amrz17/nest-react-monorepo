@@ -23,11 +23,11 @@ import { ActivityLogsModule } from "../activity-logs/activity-logs.module";
         OutboundEntity,
         ActivityLogsEntity
     ]),
-    JwtModule.register({
-        secret: process.env.JWT_SECRET,
-        signOptions: { expiresIn: '1d' },
+        JwtModule.register({
+            secret: process.env.JWT_SECRET,
+            signOptions: { expiresIn: '1d' },
     }),
-    ActivityLogsModule
+        ActivityLogsModule
     ],
     controllers: [UserContainerOptions],
     providers: [UserService],

@@ -16,6 +16,8 @@ import { SuppliersModule } from './suppliers/suppliers.module';
 import { SalesModule } from './sales/sales.module';
 import { ItemsModule } from './items/items.module';
 import { ActivityLogsModule } from './activity-logs/activity-logs.module';
+import { APP_GUARD } from '@nestjs/core';
+import { RolesGuard } from './user/guards/roles.guard';
 
 @Module({
   imports: [
@@ -55,6 +57,12 @@ import { ActivityLogsModule } from './activity-logs/activity-logs.module';
     ActivityLogsModule
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard
+    },
+  ],
 })
 export class AppModule {}
