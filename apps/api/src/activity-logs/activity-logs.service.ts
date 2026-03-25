@@ -40,8 +40,12 @@ export class ActivityLogsService {
 
     async getActivityLogs (): Promise<any> {
         return this.activityLogsRepo.find({
+            // descending order berdasarkan created_at
+            order: {
+                created_at: 'DESC'
+            },
             relations: [
-                'createdBy'
+                'createdBy',
             ]
         })
     }

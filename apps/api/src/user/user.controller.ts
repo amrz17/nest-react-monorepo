@@ -9,6 +9,7 @@ import { UpdateUserDto } from "./dto/updateUser.dto";
 import { type AuthRequest } from "./types/expressRequest.interface";
 import { Roles } from "./decorators/roles.decorator";
 import { RolesGuard } from "./guards/roles.guard";
+import { UserRole } from "./user.entity";
 
 // TODO : FINISH RBAC (Role-Based Access Control) Feature
 
@@ -18,23 +19,21 @@ export class UserContainerOptions {
 
     @Post('users')
     @UsePipes(new ValidationPipe())
+    @UseGuards(RolesGuard)
+    @Roles(UserRole.ADMIN, UserRole.MANAGER)
     async create(@Body() createUserDto: CreateUserDto): Promise<IUserResponse> {
         return await this.userService.createUser(createUserDto);
     }
 
-    @Roles('MANAGER', 'STAFF_GUDANG', 'PICKER')
     @Post('user/login')
     @UsePipes(new ValidationPipe())
-    @UseGuards(AuthGuard, RolesGuard) 
     async loginUser(@Body('user') loginUserDto: LoginDto): Promise<IUserResponse> {
         const user = await this.userService.loginUser(loginUserDto);
         console.log(user);
         return this.userService.generatedUserResponse(user);
     }
 
-    @Roles('MANAGER', 'STAFF_GUDANG', 'PICKER')
     @Post('user/logout')
-    @UseGuards(AuthGuard, RolesGuard) 
     async logout(@Req() req: AuthRequest) {
         const userId = req.user.id_user; 
         

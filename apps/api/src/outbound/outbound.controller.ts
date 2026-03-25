@@ -3,7 +3,12 @@ import { OutboundService } from './outbound.service';
 import { CreateOutbounddDto } from './dto/create-outbound.dto';
 import { AuthGuard } from '../user/guards/auth.guard';
 import { type AuthRequest } from '../user/types/expressRequest.interface';
+import { Roles } from '../user/decorators/roles.decorator';
+import { RolesGuard } from '../user/guards/roles.guard';
+import { UserRole } from '../user/user.entity';
 
+@UseGuards(AuthGuard, RolesGuard)
+@Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF_GUDANG)
 @Controller('outbound')
 export class OutboundController {
     constructor(
@@ -12,7 +17,6 @@ export class OutboundController {
 
     // 
     @Post()
-    @UseGuards(AuthGuard)
     async createOutbound(
         @Body() createOuboundDto: CreateOutbounddDto,
         @Req() req: AuthRequest
@@ -40,7 +44,5 @@ export class OutboundController {
 
         return await this.outboundService.generatedResponse(outbounds);
     }
-
-
 
 }

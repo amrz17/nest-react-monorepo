@@ -10,6 +10,10 @@ export class RolesGuard implements CanActivate {
     canActivate(context: ExecutionContext): boolean | Promise<boolean> | Observable<boolean> {
         const { user } = context.switchToHttp().getRequest();
 
+        // console.log('User:', user);
+        // console.log('Role:', user?.role);
+        // console.log('Tipe data role:', typeof user?.role);
+
         if (user?.role == 'ADMIN') return true;
 
         const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [

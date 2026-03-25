@@ -5,13 +5,18 @@ import { IInventoryResponse } from './types/inventoryResponse.interface';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
 import { AuthGuard } from '../user/guards/auth.guard';
 import { type AuthRequest } from '../user/types/expressRequest.interface';
+import { RolesGuard } from '../user/guards/roles.guard';
+import { Roles } from '../user/decorators/roles.decorator';
+import { UserRole } from '../user/user.entity';
 
 @Controller('inventory')
+@UseGuards(RolesGuard)
 export class InventoryController {
     constructor(private readonly inventoryService: InventoryService) {}
 
     // Get All
     @Get()
+    @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF_GUDANG, UserRole.PICKER)
     async getAllInventory(): Promise<IInventoryResponse> {
         const inventorys = await this.inventoryService.getAllInventory();
         return this.inventoryService.generateResponseInventory(inventorys);
@@ -20,6 +25,7 @@ export class InventoryController {
     // create Inventory
     @Post()
     @UseGuards(AuthGuard)
+    @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF_GUDANG)
     async createInventory(
         @Body() createInventoryDto: CreateInventoryDto,
         @Req() req: AuthRequest
@@ -33,6 +39,7 @@ export class InventoryController {
     // update Inventory
     @Put('update/:id_inventory')
     @UseGuards(AuthGuard)
+    @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF_GUDANG)
     async updateInventory(
         @Param('id_inventory', new ParseUUIDPipe()) id_inventory: string,
         @Body() updateInventoryDto: UpdateInventoryDto,
@@ -47,6 +54,7 @@ export class InventoryController {
     // delete inventory
     @Delete('delete/:id_inventory')
     @UseGuards(AuthGuard)
+    @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF_GUDANG)
     async deleteInventory(
         @Param('id_inventory', new ParseUUIDPipe()) id_inventory: string,
         @Req() req: AuthRequest

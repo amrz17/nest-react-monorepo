@@ -1,9 +1,14 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, UseGuards } from '@nestjs/common';
 import { CustomersService } from './customers.service';
 import { CreateCustomerDto } from './dto/create-customer.dto';
 import { ICustomerResponse } from './types/customerResponse.interface';
 import { UpdateCustomerDto } from './dto/update-customer.dto';
+import { Roles } from '../user/decorators/roles.decorator';
+import { RolesGuard } from '../user/guards/roles.guard';
+import { AuthGuard } from '../user/guards/auth.guard';
 
+@Roles('MANAGER')
+@UseGuards(AuthGuard, RolesGuard) 
 @Controller('customer')
 export class CustomersController {
     constructor(
