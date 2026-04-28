@@ -7,7 +7,6 @@ import { SalesOrderEntity } from '../sales/entities/sales-order.entity';
 import { UserEntity } from '../user/user.entity';
 import { SaleOrderItemsEntity } from '../sales/entities/sale-order-items.entity';
 import { ItemsEntity } from '../items/items.entity';
-import { CustomerEntity } from '../customers/customer.entity';
 import { ActivityLogsModule } from '../activity-logs/activity-logs.module';
 
 @Module({
@@ -17,7 +16,6 @@ import { ActivityLogsModule } from '../activity-logs/activity-logs.module';
     UserEntity,
     SaleOrderItemsEntity,
     ItemsEntity,
-    CustomerEntity,
   ]),
     ActivityLogsModule
   ],

@@ -4,6 +4,8 @@ import { CreateSaleDTO } from './dto/create-sale.dto';
 import { ISaleResponse } from './types/salesResponse.interface';
 import { AuthGuard } from '../user/guards/auth.guard';
 import { type AuthRequest } from '../user/types/expressRequest.interface';
+import { Roles } from '../user/decorators/roles.decorator';
+import { UserRole } from '../user/user.entity';
 
 @Controller('sale-order')
 export class SalesController {
@@ -19,6 +21,7 @@ export class SalesController {
     // 
     @Post()
     @UseGuards(AuthGuard)
+    @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF_GUDANG)
     async createSale(
         @Body() createSaleOrderDto: CreateSaleDTO,
         @Req() req: AuthRequest
@@ -30,12 +33,23 @@ export class SalesController {
     }
 
     @Post('/cancel/:id_so')
+    @UseGuards(AuthGuard)
+    @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF_GUDANG)
     async cancelSaleOrder(
         @Param('id_so', new ParseUUIDPipe()) id_so: string,
+        @Req() req: AuthRequest
     ): Promise<any> {
-        const so = await this.saleOrderService.cancelSaleOrder(id_so);
+        const userId = req.user.id_user;
+        const so = await this.saleOrderService.cancelSaleOrder(id_so, userId);
 
         return await this.saleOrderService.generateSaleOrderResponse(so);
+    }
+    
+    @Get(':id/items')
+    // @UseGuards(AuthGuard)
+    // @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF_GUDANG)
+    async getSOItems(@Param('id') id: string) {
+        return this.saleOrderService.getSOItems(id);
     }
 
 }

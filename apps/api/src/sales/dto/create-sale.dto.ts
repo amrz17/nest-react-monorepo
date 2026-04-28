@@ -15,9 +15,6 @@ export class CreateSaleDTO {
     date_shipped: Date;
 
     @IsUUID()
-    id_user: string;
-
-    @IsUUID()
     id_customer: string;
 
     @IsOptional()

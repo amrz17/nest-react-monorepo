@@ -7,7 +7,6 @@ import { InboundItemEntity } from './entities/inbound-item.entity';
 import { PurchaseOrderItemsEntity } from '../orders/entities/order-items.entity';
 import { ItemsEntity } from '../items/items.entity';
 import { UserEntity } from '../user/user.entity';
-import { SupplierEntity } from '../suppliers/suppliers.entity';
 import { OrderEntity } from '../orders/entities/orders.entity';
 import { ActivityLogsModule } from '../activity-logs/activity-logs.module';
 
@@ -19,7 +18,6 @@ import { ActivityLogsModule } from '../activity-logs/activity-logs.module';
         PurchaseOrderItemsEntity,
         ItemsEntity,
         UserEntity,
-        SupplierEntity
     ]),
         ActivityLogsModule
     ],

@@ -8,6 +8,7 @@ import { PurchaseOrderItemsEntity } from './entities/order-items.entity';
 import { UserEntity } from '../user/user.entity';
 import { InboundEntity } from '../inbound/entities/inbound.entity';
 import { ActivityLogsModule } from '../activity-logs/activity-logs.module';
+import { ItemsEntity } from '../items/items.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([
@@ -15,7 +16,8 @@ import { ActivityLogsModule } from '../activity-logs/activity-logs.module';
     UserEntity,
     SupplierEntity,
     PurchaseOrderItemsEntity,
-    InboundEntity
+    InboundEntity,
+    ItemsEntity
   ]),
     ActivityLogsModule
   ],

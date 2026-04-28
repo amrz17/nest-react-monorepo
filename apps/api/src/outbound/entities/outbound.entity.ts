@@ -1,4 +1,3 @@
-import { CustomerEntity } from "../../customers/customer.entity";
 import { SalesOrderEntity } from "../../sales/entities/sales-order.entity";
 import { UserEntity } from "../../user/user.entity";
 import { OutboundItemEntity } from "./outbound-item.entity";
@@ -33,12 +32,6 @@ export class OutboundEntity {
     @ManyToOne(() => UserEntity)
     @JoinColumn( { name: 'id_user' } )
     shipped_by: UserEntity;
-
-    @Column()
-    id_customer: string;
-    @ManyToOne(() => CustomerEntity)
-    @JoinColumn( { name: 'id_customer' } )
-    customer: CustomerEntity;
 
     @Column()
     shipped_at: Date;

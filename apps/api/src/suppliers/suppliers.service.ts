@@ -23,7 +23,10 @@ export class SuppliersService {
     }
 
     // create Supplier
-    async createSupplier(createSupplierDto: CreateSupplierDto): Promise<SupplierEntity> {
+    async createSupplier(
+        createSupplierDto: CreateSupplierDto,
+        userId: string
+    ): Promise<SupplierEntity> {
 
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
@@ -39,7 +42,7 @@ export class SuppliersService {
 
             // simpan logs
             await this.activityLogsService.createLogs(queryRunner.manager, {
-                id_user: '',
+                id_user: userId,
                 action: 'CREATE',
                 module: "SUPPLIER",
                 resource_id: (await savedSupplier).id_supplier,
@@ -64,7 +67,8 @@ export class SuppliersService {
     // update Supplier
     async updateSupplier(
         id_supplier: string,
-        updateSupplierDto: UpdateSupplierDto
+        updateSupplierDto: UpdateSupplierDto,
+        userId: string
     ): Promise<SupplierEntity> {
         // const supplier = await this.supplierRepository.findOne({ where: { id_supplier }})
 
@@ -102,7 +106,7 @@ export class SuppliersService {
 
             // save log
             await this.activityLogsService.createLogs(queryRunner.manager, {
-                id_user: '',
+                id_user: userId,
                 action: 'UPDATE',
                 module: 'SUPPLIER',
                 resource_id: id_supplier,
@@ -131,7 +135,8 @@ export class SuppliersService {
 
     // 
     async deleteSupplier(
-        id_supplier: string
+        id_supplier: string,
+        userId: string
     ): Promise<void> {
         // await this.supplierRepository.delete({ id_supplier})
 
@@ -154,7 +159,7 @@ export class SuppliersService {
 
             // save log
             await this.activityLogsService.createLogs(queryRunner.manager, {
-                id_user: '',
+                id_user: userId,
                 action: 'DELETE',
                 module: 'SUPPLIER',
                 resource_id: id_supplier,

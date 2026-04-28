@@ -41,19 +41,28 @@ export class InventoryService {
                 id_user: userId
             });
 
-            const savedInventory = queryRunner.manager.save(newInventory);            
+            const savedInventory = await queryRunner.manager.save(newInventory);            
+
+            const inventoryWithRelations = await queryRunner.manager.findOne(InventoryEntity, {
+                where: { id_inventory: savedInventory.id_inventory },
+                relations: ['item', 'location'],
+            });
+
+            if (!inventoryWithRelations) {
+                throw new Error('Inventory not found after save');
+            }
 
             // simpan logs
             await this.activityLogsService.createLogs(queryRunner.manager, {
                 id_user: userId,
                 action: 'CREATE',
                 module: "INVENTORY",
-                resource_id: (await savedInventory).id_inventory,
-                description: `For item: ${(await savedInventory).item.name}, at: ${(await savedInventory).location.bin_code}.`,
+                resource_id: savedInventory.id_inventory,
+                description: `For item: ${inventoryWithRelations.item.name}, at: ${inventoryWithRelations.location.bin_code}`,
                 metadata: {
-                    initial_qty: (await savedInventory).qty_available,
-                    initial_reserved: (await savedInventory).qty_reserved,
-                    initial_ordered: (await savedInventory).qty_ordered,
+                    initial_qty: savedInventory.qty_available,
+                    initial_reserved: savedInventory.qty_reserved,
+                    initial_ordered: savedInventory.qty_ordered,
                 }
             })
 
@@ -141,7 +150,8 @@ export class InventoryService {
         try {
             // find data
             const inventory = await queryRunner.manager.findOne(InventoryEntity, { 
-                where: { id_inventory } 
+                where: { id_inventory },
+                relations: ['item', 'location'],
             });
 
             if (!inventory) {

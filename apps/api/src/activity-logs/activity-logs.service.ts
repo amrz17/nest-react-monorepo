@@ -21,7 +21,6 @@ export class ActivityLogsService {
         private readonly dataSource: DataSource
     ) {}
 
-    // TODO : Add methods to handle activity logs here
     // create log
     async createLogs (
         manager: EntityManager,

@@ -12,7 +12,6 @@ export class ActivityLogsController {
         private readonly activityLogsService: ActivityLogsService
     ) {}
 
-    // TODO : Add endpoints to handle activity logs here
     @Get()
     @Roles(UserRole.ADMIN, UserRole.MANAGER) 
     async getActivityLogs (): Promise<IActivityLogsResponse> {

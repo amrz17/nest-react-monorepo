@@ -5,6 +5,9 @@ export class UpdatePOIDto {
     @IsString()
     readonly id_po: string;    
 
+    // @IsString()
+    // readonly poi_number: string;
+
     @IsUUID()
     @IsString()
     readonly id_item: string;

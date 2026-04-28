@@ -2,8 +2,10 @@ import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Post, Put, Req, Us
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { IOrdersResponse } from './types/ordersResponse.interface';
-import { AuthGuard } from 'src/user/guards/auth.guard';
+import { AuthGuard } from '../user/guards/auth.guard';
 import { type AuthRequest } from '../user/types/expressRequest.interface';
+import { Roles } from '../user/decorators/roles.decorator';
+import { UserRole } from '../user/user.entity';
 
 @Controller('purchase-order')
 export class OrdersController {
@@ -11,7 +13,8 @@ export class OrdersController {
 
     // Create Order
     @Post('')
-    @UseGuards(AuthGuard)
+    // @UseGuards(AuthGuard)
+    // @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF_GUDANG)
     async createOrder(
         @Body() createOrderDto: CreateOrderDto,
         @Req() req: AuthRequest
@@ -32,12 +35,22 @@ export class OrdersController {
 
     // Cancel Purchase Order
     @Post('/cancel/:id_po')
+    @UseGuards(AuthGuard)
+    @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF_GUDANG)
     async cancelPurchaseOrder(
         @Param('id_po', new ParseUUIDPipe()) id_po: string,
+        @Req() req: AuthRequest
     ): Promise<any> {
-        const po = await this.ordersService.cancelPurchaseOrder(id_po);
+        const userId = req.user.id_user;
+        const po = await this.ordersService.cancelPurchaseOrder(id_po, userId);
 
         return await this.ordersService.generatedOrderResponse(po);
+    }
+    @Get(':id/items')
+    @UseGuards(AuthGuard)
+    @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF_GUDANG)
+    async getPOItems(@Param('id') id: string) {
+        return this.ordersService.getPOItems(id);
     }
 
     // // Get Orders by User ID

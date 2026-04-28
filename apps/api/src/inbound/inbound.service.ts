@@ -9,6 +9,7 @@ import { InventoryEntity } from '../inventory/inventory.entity';
 import { PurchaseOrderItemsEntity } from '../orders/entities/order-items.entity';
 import { OrderEntity, PurchaseOrderStatus } from '../orders/entities/orders.entity';
 import { ActivityLogsService } from '../activity-logs/activity-logs.service';
+import { ItemsEntity } from '../items/items.entity';
 
 @Injectable()
 export class InboundService {
@@ -31,24 +32,55 @@ export class InboundService {
         await queryRunner.startTransaction();
 
         try {
+            // Format Inbound Number: IN-20260420-0001, IN-20260420-0002
+            const count = await queryRunner.manager.count(InboundEntity);
+            const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
+            const inboundNumber = `IB-${dateStr}-${String(count + 1).padStart(4, '0')}`;
+
             // Save Header 
             const inboundHeader = queryRunner.manager.create(InboundEntity, {
-                inbound_number: createInboundDto.inbound_number,
+                inbound_number: inboundNumber,
                 purchaseOrder: { id_po: createInboundDto.id_po },
-                receivedBy: { id_user: userId },
-                supplierName: { id_supplier: createInboundDto.id_supplier },
+                id_user:  userId,
                 received_at: createInboundDto.received_at,
                 note: createInboundDto.note,
-
             })
             const saveInbound = await queryRunner.manager.save(inboundHeader);
+            console.log('Inbound :', inboundHeader);
 
             // Loop Items untuk Save Detail & Update Inventory
             for (const itemDto of createInboundDto.items) {
+
+                // Ambil PO Item dari database
+                const poItem = await queryRunner.manager.findOne(PurchaseOrderItemsEntity, {
+                    where: { id_poi: itemDto.id_poi },
+                });
+
+                if (!poItem) throw new BadRequestException(`PO Item ${itemDto.id_poi} tidak ditemukan`);
+
+                // Validasi id_item sesuai database
+                const itemExists = await queryRunner.manager.findOne(ItemsEntity, {
+                    where: { id_item: poItem.id_item }
+                });
+
+                if (!itemExists) {
+                    throw new BadRequestException(
+                        `Item dengan id ${poItem.id_item} tidak ditemukan di database`
+                    );
+                }
+
+                // Validasi qty tidak melebihi yang dipesan
+                const sisaQty = Number(poItem.qty_ordered) - Number(poItem.qty_received);
+                if (Number(itemDto.qty_received) > sisaQty) {
+                    throw new BadRequestException(
+                        `Qty melebihi sisa PO. Sisa: ${sisaQty}, Input: ${itemDto.qty_received}`
+                    );
+                }
                 
                 // Simpan Inbound Item (Detail)
                 const inboundItem = queryRunner.manager.create(InboundItemEntity, {
                     inbound: saveInbound, 
+                    id_user: userId,
                     id_item: itemDto.id_item,
                     id_poi: itemDto.id_poi, 
                     qty_received: Number(itemDto.qty_received),
@@ -83,23 +115,43 @@ export class InboundService {
                     );
                 }
 
+                // // Update Inventory berdasarkan id item
+                // let inventory = await queryRunner.manager.findOne(InventoryEntity, {
+                //     where: { 
+                //         id_item: itemDto.id_item, 
+                //     }
+                // });
+
+                // if (inventory) {
+                //     // Update stok yang ada
+                //     inventory.qty_available = Number(inventory.qty_available) + Number(itemDto.qty_received);
+                // } else {
+                //     // Buat baris baru jika barang belum pernah ada di lokasi tersebut
+                //     inventory = queryRunner.manager.create(InventoryEntity, {
+                //         id_item: itemDto.id_item,
+                //         qty_available: Number(itemDto.qty_received),
+                //     });
+                // }
+                // await queryRunner.manager.save(inventory);
+
+
                 // Update Inventory berdasarkan id item
-                let inventory = await queryRunner.manager.findOne(InventoryEntity, {
+                const inventory = await queryRunner.manager.findOne(InventoryEntity, {
                     where: { 
-                        id_item: itemDto.id_item, 
+                        id_item: poItem.id_item, // ← dari database, bukan DTO
                     }
                 });
 
-                if (inventory) {
-                    // Update stok yang ada
-                    inventory.qty_available = Number(inventory.qty_available) + Number(itemDto.qty_received);
-                } else {
-                    // Buat baris baru jika barang belum pernah ada di lokasi tersebut
-                    inventory = queryRunner.manager.create(InventoryEntity, {
-                        id_item: itemDto.id_item,
-                        qty_available: Number(itemDto.qty_received),
-                    });
+                // ✅ Validasi inventory harus sudah ada
+                if (!inventory) {
+                    throw new BadRequestException(
+                        `Item "${itemExists.name}" belum terdaftar di inventory. Tambahkan ke inventory terlebih dahulu sebelum melakukan inbound.`
+                    );
                 }
+
+                // Update stok
+                inventory.qty_available = Number(inventory.qty_available) + Number(itemDto.qty_received);
+                inventory.qty_ordered = Math.max(0, Number(inventory.qty_ordered) - Number(itemDto.qty_received));
                 await queryRunner.manager.save(inventory);
 
                 // update progress PO Item
@@ -120,9 +172,8 @@ export class InboundService {
                 metadata: {
                     inbound_number: (await saveInbound).inbound_number,
                     id_po: (await saveInbound).id_po,
-                    id_user: (await saveInbound).id_user,
+                    id_user: userId,
                     received_at: (await saveInbound).received_at,
-                    id_supplier: (await saveInbound).id_supplier,
                     note: (await saveInbound).note,
                     status_inbound: (await saveInbound).status_inbound,
                 }
@@ -145,7 +196,7 @@ export class InboundService {
 
     async getAllInbound(): Promise<InboundEntity[]> {
         return await this.inboundRepo.find({
-            relations: ['receivedBy', 'supplierName', 'items.item'],
+            relations: ['receivedBy', 'items.item'],
             order: {
                 created_at: 'DESC'
             }
@@ -154,7 +205,8 @@ export class InboundService {
 
     // 
     async cancelInbound(
-        id_inbound: string
+        id_inbound: string,
+        userId: string
     ): Promise<any> {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
@@ -198,7 +250,7 @@ export class InboundService {
 
             // simpan logs
             await this.activityLogsService.createLogs(queryRunner.manager, {
-                id_user: '',
+                id_user: userId,
                 action: 'CANCEL',
                 module: "INBOUND",
                 resource_id: (await inbound).id_inbound,
@@ -206,9 +258,8 @@ export class InboundService {
                 metadata: {
                     inbound_number: (await inbound).inbound_number,
                     id_po: (await inbound).id_po,
-                    id_user: (await inbound).id_user,
+                    id_user: userId,
                     received_at: (await inbound).received_at,
-                    id_supplier: (await inbound).id_supplier,
                     note: (await inbound).note,
                     status_inbound: (await inbound).status_inbound,
                 }

@@ -7,7 +7,7 @@ import { SaleOrderItemsEntity } from './entities/sale-order-items.entity';
 import { ISaleResponse } from './types/salesResponse.interface';
 import { InventoryEntity } from '../inventory/inventory.entity';
 import { ActivityLogsService } from '../activity-logs/activity-logs.service';
-import { UpdateCustomerDto } from 'src/customers/dto/update-customer.dto';
+import { ItemsEntity } from '../items/items.entity';
 
 @Injectable()
 export class SalesService {
@@ -50,7 +50,7 @@ export class SalesService {
                 so_status: createSaleDTO.so_status,
                 date_shipped: createSaleDTO.date_shipped,
                 customer: { id_customer: createSaleDTO.id_customer},
-                createdBy: { id_user: userId },
+                id_user: userId,
                 note: createSaleDTO.note
             } as any);
 
@@ -60,16 +60,29 @@ export class SalesService {
             // loop untuk save detail dan update inventory
             for (const itemDto of createSaleDTO.items) {
 
+                const item_number = '10';
+
+                // Ambil data item dari database
+                const item = await queryRunner.manager.findOne(ItemsEntity, {
+                where: { id_item: itemDto.id_item }
+                });
+
+                if (!item) throw new Error(`Item dengan id ${itemDto.id_item} tidak ditemukan`);
+
+                // Price dari database
+                const price_per_unit = item.price;
+
                 // simpan 
                 const soItems = queryRunner.manager.create(SaleOrderItemsEntity, {
                     sales_order : saveSO,
                     id_item : itemDto.id_item,
+                    soi_number :item_number, 
                     qty_ordered : itemDto.qty_ordered,
-                    price_per_unit : itemDto.price_per_unit, 
+                    price_per_unit : price_per_unit, 
                     qty_shipped : itemDto.qty_shipped,
 
                     // Auto logic
-                    total_price : itemDto.qty_ordered * itemDto.price_per_unit
+                    total_price : itemDto.qty_ordered * price_per_unit
                 })
                 await queryRunner.manager.save(soItems);
 
@@ -127,7 +140,10 @@ export class SalesService {
         }
     }
 
-    async cancelSaleOrder(id_so: string): Promise<any> {
+    async cancelSaleOrder(
+        id_so: string,
+        userId: string
+    ): Promise<any> {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
@@ -158,14 +174,14 @@ export class SalesService {
 
             // simpan logs
             await this.activityLogsService.createLogs(queryRunner.manager, {
-                id_user: '',
+                id_user: userId,
                 action: 'CANCEL',
                 module: "SALE ORDER",
                 resource_id: so.id_so,
                 description: so.so_number,
                 metadata: {
                     createdBy: so.createdBy,
-                    customer: so.customer.full_name,
+                    customer: so.id_customer,
                     date_shipped: so.date_shipped,
                     so_status: so.so_status,
                     note: so.note,
@@ -181,6 +197,15 @@ export class SalesService {
             await queryRunner.release();
         }
     }
+
+   async getSOItems(
+      id_so: string
+   ): Promise<SaleOrderItemsEntity[]> {
+      return this.dataSource.getRepository(SaleOrderItemsEntity).find({
+         where: { id_so },
+         relations: ['item']
+      });
+   }
 
     // 
     generateSaleOrderResponse(

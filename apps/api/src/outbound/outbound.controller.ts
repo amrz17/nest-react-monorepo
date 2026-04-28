@@ -17,6 +17,7 @@ export class OutboundController {
 
     // 
     @Post()
+    @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF_GUDANG)
     async createOutbound(
         @Body() createOuboundDto: CreateOutbounddDto,
         @Req() req: AuthRequest
@@ -29,16 +30,20 @@ export class OutboundController {
 
     //
     @Post('cancel/:id_outbound')
+    @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF_GUDANG)
     async cancelOutbound(
-        @Param('id_outbound', new ParseUUIDPipe()) id_outbound: string
+        @Param('id_outbound', new ParseUUIDPipe()) id_outbound: string,
+        @Req() req: AuthRequest
     ): Promise<any> {
-        const cancel = await this.outboundService.cancelOutbound(id_outbound);
+        const userId = req.user.id_user;
+        const cancel = await this.outboundService.cancelOutbound(id_outbound, userId);
 
         return await this.outboundService.generatedResponse(cancel);
     }
 
     //
     @Get()
+    @Roles(UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF_GUDANG)
     async getAllOutbound(): Promise<any> {
         const outbounds = await this.outboundService.getAllOutbound();
 

@@ -10,12 +10,6 @@ export class CreateOutbounddDto {
     @IsUUID()
     id_so: string;
 
-    @IsUUID()
-    id_user: string;
-
-    @IsUUID()
-    id_customer: string;
-
     @IsDateString()
     shipped_at: string;
 

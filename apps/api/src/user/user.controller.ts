@@ -11,7 +11,6 @@ import { Roles } from "./decorators/roles.decorator";
 import { RolesGuard } from "./guards/roles.guard";
 import { UserRole } from "./user.entity";
 
-// TODO : FINISH RBAC (Role-Based Access Control) Feature
 
 @Controller()
 export class UserContainerOptions {

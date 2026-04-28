@@ -35,12 +35,6 @@ export class InboundEntity {
     @Column()
     received_at: Date;
 
-    @Column()
-    id_supplier: string;
-    @ManyToOne(() => SupplierEntity, (supplier) => supplier.inbound)
-    @JoinColumn({ name: 'id_supplier' })
-    supplierName: SupplierEntity;
-
     @Column({ nullable: true })
     note: string;
 

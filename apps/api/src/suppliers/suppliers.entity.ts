@@ -18,7 +18,4 @@ export class SupplierEntity {
 
     @OneToMany(() => OrderEntity, (order) => order.supplier)
     purchaseOrder: OrderEntity[];
-
-    @OneToMany(() => InboundEntity, (inbound) => inbound.supplierName)
-    inbound: InboundEntity[];
 }

@@ -6,6 +6,7 @@ import { type AuthRequest } from '../user/types/expressRequest.interface';
 import { RolesGuard } from '../user/guards/roles.guard';
 import { Roles } from '../user/decorators/roles.decorator';
 import { UserRole } from '../user/user.entity';
+import { AuthGuard } from '../user/guards/auth.guard';
 
 @Controller('inbound')
 @UseGuards(RolesGuard)
@@ -16,6 +17,7 @@ export class InboundController {
 
     //
     @Get()
+    @UseGuards(AuthGuard)
     @Roles( UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF_GUDANG, UserRole.PICKER)
     async getAllInbound(): Promise<IInboundResponse> {
         const inbounds = await this.inboundService.getAllInbound();
@@ -25,6 +27,7 @@ export class InboundController {
 
     //
     @Post()
+    @UseGuards(AuthGuard)
     @Roles( UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF_GUDANG)
     async createInbound(
         @Body() createInboundDto: CreateInboundDto,
@@ -38,11 +41,14 @@ export class InboundController {
 
     //
     @Post('cancel/:id_inbound')
+    @UseGuards(AuthGuard)
     @Roles( UserRole.ADMIN, UserRole.MANAGER, UserRole.STAFF_GUDANG)
     async cancelInbound(
         @Param('id_inbound', new ParseUUIDPipe()) id_inbound: string,
+        @Req() req: AuthRequest
     ): Promise<IInboundResponse> {
-        const cancel = await this.inboundService.cancelInbound(id_inbound);
+        const userId = req.user.id_user;
+        const cancel = await this.inboundService.cancelInbound(id_inbound, userId);
 
         return await this.inboundService.generatedOrderResponse(cancel);
     }

@@ -27,7 +27,10 @@ export class LocationsService {
     }
 
     // Create  Location
-    async createLocation(createLocationDto: CreateLocationDto): Promise<LocationEntity> {
+    async createLocation(
+        createLocationDto: CreateLocationDto,
+        userId: string
+    ): Promise<LocationEntity> {
 
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
@@ -43,7 +46,7 @@ export class LocationsService {
 
             // simpan logs
             await this.activityLogsService.createLogs(queryRunner.manager, {
-                id_user: '',
+                id_user: userId,
                 action: 'CREATE',
                 module: "LOCATION",
                 resource_id: (await savedLocation).id_location,
@@ -66,7 +69,11 @@ export class LocationsService {
     }
 
     // Update 
-    async updateLocation(id_location: string, updateLocationDto: UpdateLocationDto): Promise<LocationEntity> {
+    async updateLocation(
+        id_location: string,
+        updateLocationDto: UpdateLocationDto,
+        userId: string
+    ): Promise<LocationEntity> {
 
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
@@ -94,7 +101,7 @@ export class LocationsService {
 
             // save log
             await this.activityLogsService.createLogs(queryRunner.manager, {
-                id_user: '',
+                id_user: userId,
                 action: 'UPDATE',
                 module: 'LOCATION',
                 resource_id: id_location,
@@ -120,7 +127,10 @@ export class LocationsService {
     }
     
     // Delete
-    async deleteLocation(id_location: string): Promise<void> {
+    async deleteLocation(
+        id_location: string,
+        userId: string
+    ): Promise<void> {
 
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
@@ -141,7 +151,7 @@ export class LocationsService {
 
             // save log
             await this.activityLogsService.createLogs(queryRunner.manager, {
-                id_user: '',
+                id_user: userId,
                 action: 'DELETE',
                 module: 'LOCATION',
                 resource_id: id_location,

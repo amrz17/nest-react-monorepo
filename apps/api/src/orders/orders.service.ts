@@ -7,6 +7,7 @@ import { IOrdersResponse } from './types/ordersResponse.interface';
 import { PurchaseOrderItemsEntity } from './entities/order-items.entity';
 import { InventoryEntity } from '../inventory/inventory.entity';
 import { ActivityLogsService } from '../activity-logs/activity-logs.service';
+import { ItemsEntity } from '../items/items.entity';
 
 @Injectable()
 export class OrdersService {
@@ -35,35 +36,44 @@ export class OrdersService {
          // Simpan header po
          const poHeader = queryRunner.manager.create(OrderEntity, {
             po_number : poNumber,
-            createdBy: userId,
+            id_user: userId,
             supplier: { id_supplier: createOrderDto.id_supplier},
             status: PurchaseOrderStatus.PENDING,
             expected_delivery_date: createOrderDto.expected_delivery_date,
             note: createOrderDto.note
          } as any);
          const savePO = await queryRunner.manager.save(poHeader);
+         console.log('Saved PO Header:', savePO);
 
-         // Simpan items po dan update inventory
          for (const itemDto of createOrderDto.items) {
+            const item_number = '10';
 
-            // simpan 
+            // Ambil data item dari database
+            const item = await queryRunner.manager.findOne(ItemsEntity, {
+               where: { id_item: itemDto.id_item }
+            });
+
+            if (!item) throw new Error(`Item dengan id ${itemDto.id_item} tidak ditemukan`);
+
+            // Price dari database
+            const price_per_unit = item.price;
+
             const poItems = queryRunner.manager.create(PurchaseOrderItemsEntity, {
-                purchaseOrder : savePO,
-                id_item : itemDto.id_item,
-                qty_ordered : itemDto.qty_ordered,
-                price_per_unit : itemDto.price_per_unit,
-
-                // Auto logic
-                qty_received : 0,
-                total_price : itemDto.qty_ordered * itemDto.price_per_unit
+               purchaseOrder: savePO,
+               id_item: itemDto.id_item,
+               poi_number: item_number,
+               qty_ordered: itemDto.qty_ordered,
+               price_per_unit: price_per_unit,         
+               qty_received: 0,
+               total_price: itemDto.qty_ordered * price_per_unit 
             } as any);
+
             await queryRunner.manager.save(poItems);
 
-            const poId = itemDto.id_item;
-
-            // Update inventory - tambah qty_ordered di inventory
-            await queryRunner.manager.increment(InventoryEntity, 
-               { id_item: poId },
+            // Update inventory
+            await queryRunner.manager.increment(
+               InventoryEntity,
+               { id_item: itemDto.id_item },
                "qty_ordered",
                itemDto.qty_ordered,
             );
@@ -110,7 +120,10 @@ export class OrdersService {
    }
 
    // Cancel Purchase Order
-   async cancelPurchaseOrder(id_po: string): Promise<any> {
+   async cancelPurchaseOrder(
+      id_po: string,
+      userId: string
+   ): Promise<any> {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
         await queryRunner.startTransaction();
@@ -141,7 +154,7 @@ export class OrdersService {
 
             // simpan logs
             await this.activityLogsService.createLogs(queryRunner.manager, {
-                  id_user: '',
+                  id_user: userId,
                   action: 'CANCEL',
                   module: "PURCHASE ORDER",
                   resource_id: id_po,
@@ -164,6 +177,15 @@ export class OrdersService {
             await queryRunner.release();
         }
     }
+
+   async getPOItems(
+      id_po: string
+   ): Promise<PurchaseOrderItemsEntity[]> {
+      return this.dataSource.getRepository(PurchaseOrderItemsEntity).find({
+         where: { id_po },
+         relations: ['item']
+      });
+   }
 
    // Helper method to generate order response
    generatedOrderResponse(order: OrderEntity | OrderEntity[]): IOrdersResponse {

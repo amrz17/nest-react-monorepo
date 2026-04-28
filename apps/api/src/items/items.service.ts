@@ -28,7 +28,10 @@ export class ItemsService {
   }
 
   // Create Item
-  async createItem(createItemDto: CreateItemDto): Promise<ItemsEntity> {
+  async createItem(
+    createItemDto: CreateItemDto,
+    userId: string
+): Promise<ItemsEntity> {
     // const newItem = new ItemsEntity();
     // Object.assign(newItem, createItemDto);
 
@@ -48,7 +51,7 @@ export class ItemsService {
 
           // simpan logs
           await this.activityLogsService.createLogs(queryRunner.manager, {
-              id_user: "ADMIN",
+              id_user: userId,
               action: 'CREATE',
               module: "ITEM",
               resource_id: (await savedItem).id_item,
@@ -73,7 +76,11 @@ export class ItemsService {
   }
 
   // Edit Item
-  async updateItem(id_item: string, updateItemDto: UpdateItemDto): Promise<ItemsEntity> {
+  async updateItem(
+    id_item: string,
+    updateItemDto: UpdateItemDto,
+    userId: string
+): Promise<ItemsEntity> {
     // const item = await this.itemRepository.findOne({ where: { id_item }})
 
     // if (!item) {
@@ -110,7 +117,7 @@ export class ItemsService {
 
           // save log
           await this.activityLogsService.createLogs(queryRunner.manager, {
-              id_user: 'ADMIN',
+              id_user: userId,
               action: 'UPDATE',
               module: 'ITEM',
               resource_id: id_item,
@@ -139,7 +146,10 @@ export class ItemsService {
   }
 
   // Delete Item
-  async deleteItem(id_item: string): Promise<void> {
+  async deleteItem(
+    id_item: string,
+    userId: string
+): Promise<void> {
     // await this.itemRepository.delete({ id_item })
       const queryRunner = this.dataSource.createQueryRunner();
       await queryRunner.connect();
@@ -160,7 +170,7 @@ export class ItemsService {
 
           // save log
           await this.activityLogsService.createLogs(queryRunner.manager, {
-              id_user: "ADMIN",
+              id_user: userId,
               action: 'DELETE',
               module: 'ITEM',
               resource_id: id_item,

@@ -22,6 +22,9 @@ export class PurchaseOrderItemsEntity {
     item: ItemsEntity;
 
     @Column()
+    poi_number: string;
+
+    @Column()
     qty_ordered: number;
 
     @Column('decimal', { precision: 10, scale: 2 })

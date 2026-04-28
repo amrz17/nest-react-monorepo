@@ -4,11 +4,12 @@ import { OutboundEntity, StatusOutbound } from './entities/outbound.entity';
 import { DataSource, QueryRunner, Repository } from 'typeorm';
 import { CreateOutbounddDto } from './dto/create-outbound.dto';
 import { OutboundItemEntity } from './entities/outbound-item.entity';
-import { SaleOrderItemsEntity } from 'src/sales/entities/sale-order-items.entity';
-import { SalesOrderEntity, SalesOrderStatus } from 'src/sales/entities/sales-order.entity';
+import { SaleOrderItemsEntity } from '../sales/entities/sale-order-items.entity';
+import { SalesOrderEntity, SalesOrderStatus } from '../sales/entities/sales-order.entity';
 import { InventoryEntity } from '../inventory/inventory.entity';
 import { IOutboundResponse } from './types/outboundResponse.Interface';
 import { ActivityLogsService } from '../activity-logs/activity-logs.service';
+import { PurchaseOrderItemsEntity } from 'src/orders/entities/order-items.entity';
 
 @Injectable()
 export class OutboundService {
@@ -29,11 +30,15 @@ export class OutboundService {
 
         try {
 
+            // Format Outbound Number: OB-20260420-0001, OB-20260420-0002
+            const count = await queryRunner.manager.count(OutboundEntity);
+            const dateStr = new Date().toISOString().split('T')[0].replace(/-/g, '');
+            const outboundNumber = `OB-${dateStr}-${String(count + 1).padStart(4, '0')}`;
+
             const outboundHeader = await queryRunner.manager.create(OutboundEntity, {
-                outbound_number: createOutboundDto.outbound_number,
+                outbound_number: outboundNumber,
                 sales_order: { id_so: createOutboundDto.id_so },
                 shipped_by: { id_user: userId },
-                customer: { id_customer: createOutboundDto.id_customer },
                 shipped_at: createOutboundDto.shipped_at,
                 carrier_name: createOutboundDto.carrier_name,
                 tracking_number: createOutboundDto.tracking_number,
@@ -133,7 +138,8 @@ export class OutboundService {
     }
 
     async cancelOutbound(
-        id_outbound: string
+        id_outbound: string,
+        userId: string
     ): Promise<any> {
         const queryRunner = this.dataSource.createQueryRunner();
         await queryRunner.connect();
@@ -176,7 +182,7 @@ export class OutboundService {
 
             // simpan logs
             await this.activityLogsService.createLogs(queryRunner.manager, {
-                id_user: '',
+                id_user: userId,
                 action: 'CANCEL',
                 module: 'OUTBOUND',
                 resource_id: outbound.id_outbound,
@@ -211,11 +217,11 @@ export class OutboundService {
             totalShipped += Number(item.qty_shipped);
         });
 
-        let newStatus = 'OPEN';
+        let newStatus = SalesOrderStatus.PENDING;
         if (totalShipped >= totalOrdered) {
-            newStatus = 'COMPLETED';
+            newStatus = SalesOrderStatus.COMPLETED;
         } else if (totalShipped > 0) {
-            newStatus = 'SHIPPED';
+            newStatus = SalesOrderStatus.SHIPPED;
         }
 
         // Update status ke tabel SO Header
@@ -228,7 +234,7 @@ export class OutboundService {
     //
     async getAllOutbound(): Promise<OutboundEntity[]> {
         return await this.outboundRepo.find({
-            relations: ['items.item', 'customer', 'shipped_by', 'sales_order']
+            relations: ['items.item', 'shipped_by', 'sales_order']
         });
     }
 

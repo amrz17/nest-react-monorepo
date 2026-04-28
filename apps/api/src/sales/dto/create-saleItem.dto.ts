@@ -1,4 +1,4 @@
-import { IsNumber, IsUUID } from "class-validator";
+import { IsNumber, IsString, IsUUID } from "class-validator";
 
 export class CreateSaleItemDto {
     @IsUUID()
@@ -9,8 +9,4 @@ export class CreateSaleItemDto {
 
     @IsNumber()
     qty_shipped: number;
-
-    @IsNumber()
-    price_per_unit: number;
-
 }

@@ -21,6 +21,9 @@ export class SaleOrderItemsEntity {
     @JoinColumn({ name: 'id_item' })
     item: ItemsEntity;
 
+    @Column()
+    soi_number: string;
+
     @Column({ type: 'int' })
     qty_ordered: number;
 
